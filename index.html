@@ -1,0 +1,126 @@
+<html>
+<head>
+<link href="image-picker.css" rel="stylesheet">
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="image-picker.min.js"></script>
+<style>
+  body {
+    background: white;
+    display: -webkit-flex;
+    -webkit-justify-content: center;
+    -webkit-align-items: center;
+    -webkit-flex-direction: column;
+  }
+  video {
+    width: 414px;
+    height: 736px;
+    background: rgba(0,0,0,0.25);
+  }
+  button {
+    display: inline-block;
+    background: -webkit-linear-gradient(#F9F9F9 40%, #E3E3E3 70%);
+    background: linear-gradient(#F9F9F9 40%, #E3E3E3 70%);
+    border: 1px solid #999;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    text-shadow: 1px 1px #fff;
+    font-weight: 700;
+    font-size: 10pt;
+  }
+  button:hover,
+  button.active {
+    border-color: black;
+  }
+  button:active,
+  button.active {
+    background: -webkit-linear-gradient(#E3E3E3 40%, #F9F9F9 70%);
+    background: linear-gradient(#E3E3E3 40%, #F9F9F9 70%);
+  }
+
+  video {
+    background: white url(desktop.png) center no-repeat;
+    border: 1px solid #e2e2e2;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  }
+  
+  #output-container {
+      position: relative;
+  }
+  
+  #grid, .grid-new-piece {
+      position: absolute;
+        top: 80px;
+        left: 24px;
+    }
+
+    #grid-new-piece-1 {
+        top: 455px;
+        left: 10px;
+    }
+    
+    #grid-new-piece-2 {
+        top: 455px;
+        left: 110px;
+    }
+    
+    #grid-new-piece-3 {
+        top: 455px;
+        left: 230px;
+    }
+  
+  #grid table td {
+        width: 33px;
+        height: 35px;
+/*       background: rgba(255,0,0,.5); */
+  }
+  
+/*
+  #grid table td.empty {
+      background: rgba(0,0,0,.5);
+  }
+  */
+  #grid table td.placement {
+      background: green;
+  }
+
+  
+  
+  .grid-new-piece table td {
+        width: 18px;
+        height: 19px;
+      background: rgba(255,0,0,.5);
+  }
+  
+  .grid-new-piece table td.empty {
+      background: rgba(0,0,0,.5);
+  }
+  
+</style>
+</head>
+<body>
+  <select id="picture" class="image-picker show-html">
+  </select>
+  <video id="iphone-screen-stream" autoplay></video>
+  <p><button id="enable-capture">Enable Capture</button></p>
+  
+  
+<button onclick="shoot()" style="width: 64px;border: solid 2px #ccc;">Capture</button>
+  
+  <div id="output-container">
+      <div id="output" style="display: inline-block; top: 4px; position: relative ;border: dotted 1px #ccc; padding: 2px;"><img src="demos/1.png"></div>
+      <div id="grid"></div>
+      <div class="grid-new-piece" id="grid-new-piece-1"></div>
+      <div class="grid-new-piece" id="grid-new-piece-2"></div>
+      <div class="grid-new-piece" id="grid-new-piece-3"></div>
+  </div>
+  
+  
+<script src="app.js"></script>
+</body>
+</html>
