@@ -109,7 +109,7 @@ function showSources() {
     //  console.log("Name: " + source.name);
       
       
-      if(source.name == "Movie Recording" || source.name == "CubeCube Demo")
+      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo")
         addSource(source);
     }
   });
@@ -159,11 +159,13 @@ function onAccessApproved(desktop_id) {
   function gotStream(stream) {
     localStream = stream;
     document.querySelector('video').src = URL.createObjectURL(stream);
-    stream.onended = function() {
+  /*  stream.onended = function() {
       if (desktopSharing) {
         toggle();
       }
     };
+    
+    */
   }
 
   function getUserMediaError(e) {
@@ -731,7 +733,7 @@ function showGrid() {
             
             for(var i = 0 ; i < 10 ; i++)
                 for(var j = 0 ; j < 10 ; j++) {
-                    if(typeof tempGrid[i] == "undefined")
+                    if(typeof tempGrid[i] === "undefined")
                         tempGrid[i] = [];
                     tempGrid[i][j] = grid[i][j];
                 }
@@ -751,7 +753,7 @@ function showGrid() {
                     console.log(space);
                     
                     
-                        
+                       //find op moves here 
                     
                     
                     for(var i = 0 ; i < shape.squares.length ; i++)
@@ -796,6 +798,10 @@ function showGrid() {
 }
 
 function capture(video, scaleFactor) {
+    
+    
+    return;
+    
     if(scaleFactor == null){
         scaleFactor = 1;
     }
@@ -862,13 +868,13 @@ function capture(video, scaleFactor) {
 function shoot(){
     var video  = document.getElementById(videoId);
     var output = document.getElementById('output');
-    var canvas = capture(video, scaleFactor);
-        canvas.onclick = function(){
+   // var canvas = capture(video, scaleFactor);
+    /*    canvas.onclick = function(){
             window.open(this.toDataURL());
-        };
+        }; */
     snapshot = canvas;
-    output.innerHTML = '';
-    output.appendChild(snapshot);
+   // output.innerHTML = '';
+  //  output.appendChild(snapshot);
 }
 
 function gridToPrint(grid) {
@@ -890,7 +896,7 @@ $(document).ready(function() {
   refresh();
   
   shoot();
-  setInterval(shoot, 15000);
+  setInterval(shoot, 100);
   
 });
 
@@ -901,6 +907,8 @@ $(window).load(function(){
     }, 1500);
     
 });
+
+
 
 document.getElementById('enable-capture').addEventListener('click', function(e) {
   toggle();
