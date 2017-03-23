@@ -9,6 +9,33 @@
 <script src="stats.min.js"></script>
   <script src="color_camera_gui.js"></script>
 
+<script type="text/javascript">
+//globals
+  
+var gridSpacing = 46.75;
+var context;
+var showLines = false;
+
+var m, b, deltaX, deltaY, wall, wallX, wallY, wallB, iData;
+    
+var iPhoneScreenWidth = 416 * 1.5;
+var iPhoneScreenHeight = 738 * 1.5;
+
+var rightWall = (391 / 416) * iPhoneScreenWidth;
+var leftWall = (30 / 416) * iPhoneScreenWidth;
+        
+var rotationPointX = (208 / 416) * iPhoneScreenWidth;
+var rotationPointY = (610 / 738) * iPhoneScreenHeight; 
+
+</script>
+
+<script src="models/Bubble.js"></script>
+<script src="models/Grid.js"></script>
+<script src="models/TouchPoint.js"></script>
+
+<script src="helpers/math.js"></script>
+<script src="helpers/imageRecognition.js"></script>
+
 <style>
   body {
     background: white;
@@ -144,367 +171,24 @@
   
 <script src="app.js"></script>
 
-
-
   <script>
       
     var grid = new Grid;
-    var gridSpacing = 46.75;
-    var context;
-    var showLines = false;
-    
-    var m, b, deltaX, deltaY, wall, wallX, wallY, wallB, iData;
-        
-    var iPhoneScreenWidth = 416 * 1.5;
-    var iPhoneScreenHeight = 738 * 1.5;
-
-    var rightWall = (391 / 416) * iPhoneScreenWidth;
-    var leftWall = (30 / 416) * iPhoneScreenWidth;
-            
-    var rotationPointX = (208 / 416) * iPhoneScreenWidth;
-    var rotationPointY = (610 / 738) * iPhoneScreenHeight;
-    
-    var touchPoints = [];
-            
-    for(var i = 100 ; i < rotationPointY ; i+=20) {
-        touchPoints.push([leftWall,i]);  
-        touchPoints.push([rightWall,i]);
-    }
-    
-    for(var i = 35 ; i <= iPhoneScreenWidth - 35 ; i+=10) {
-        touchPoints.push([i,100]);            
-    }            
-            
-    
-    function sq(x) {
-        return x * x;
-    }
-    
-    function sqrt(x) {
-        return Math.sqrt(x);
-    }
-    
-    function findCircleLineIntersections(r, h, k, m, n) {
-        // circle: (x - h)^2 + (y - k)^2 = r^2
-        // line: y = m * x + n
-        // r: circle radius
-        // h: x value of circle centre
-        // k: y value of circle centre
-        // m: slope
-        // n: y-intercept
-    
-        // get a, b, c values
-        var a = 1 + sq(m);
-        var b = -h * 2 + (m * (n - k)) * 2;
-        var c = sq(h) + sq(n - k) - sq(r);
-    
-        // get discriminant
-        var d = sq(b) - 4 * a * c;
-        if (d >= 0) {
-            // insert into quadratic formula
-            var intersections = [
-                (-b + sqrt(sq(b) - 4 * a * c)) / (2 * a),
-                (-b - sqrt(sq(b) - 4 * a * c)) / (2 * a)
-            ];
-            if (d == 0) {
-                // only 1 intersection
-                return [intersections[0]];
-            }
-            return intersections;
-        }
-        // no intersection
-        return [];
-    }
-    
-    function distanceBetweenPoints(x1, y1, x2, y2) {
-        var a = x1 - x2;
-        var b = y1 - y2;
-
-        return Math.sqrt( a*a + b*b );
-    }
-    function Bubble(x,y,color) {
-        
-        this.x = x;
-        this.y = y;
-        this.getCenterX = function() {
-            var centerX = 68 + this.x * gridSpacing;
-            
-            if(this.y % 2 === 1)
-                centerX += gridSpacing / 2;
-            
-            return centerX;
-            
-        }
-        
-        this.getCenterY = function() {
-            return 204 + this.y * gridSpacing;
-        }
-                
-        this.color = color;
-        this.adjacentMatches = function(colorToMatch) {
-            
-            
-            if(colorToMatch == null)
-                colorToMatch = this.color;
-            
-            var matches = [];
-            
-            var checkLocations = [
-                [this.x - 1, this.y],
-                [this.x + 1, this.y],
-                [this.x, this.y - 1],
-                [this.x, this.y + 1]
-            ];
-            
-            if(this.y % 2 === 0) {
-                checkLocations.push([this.x - 1,this.y - 1]);
-                checkLocations.push([this.x - 1,this.y + 1]);
-            } else {
-                checkLocations.push([this.x + 1,this.y - 1]);
-                checkLocations.push([this.x + 1,this.y + 1]);
-            }
-            
-            for(var i = 0 ; i < checkLocations.length ; i++) {
-                if(typeof grid.grid[checkLocations[i][0]] != "undefined" && typeof grid.grid[checkLocations[i][0]][checkLocations[i][1]] != "undefined" && grid.grid[checkLocations[i][0]][checkLocations[i][1]].color == colorToMatch)
-                    matches.push(grid.grid[checkLocations[i][0]][checkLocations[i][1]]);
-            }
-            
-            return matches;
-        }
-        
-        
-        this.alreadyInCluster = function(match, bubbles) {
-            for(var i = 0 ; i < bubbles.length ; i++)
-                if(bubbles[i].x == match.x && bubbles[i].y == match.y)
-                    return true;
-            return false;
-        }
-
-        
-        this.getClusterMatches = function(bubbles) {
-            var bubbles = bubbles;
-            if(bubbles == null)
-                bubbles = [this];
-            var matches = this.adjacentMatches();
-            if(matches.length === 0)
-                return bubbles;
-            else {
-                for(var i = 0 ; i < matches.length ; i++) {
-                    if(!this.alreadyInCluster(matches[i],bubbles)) {
-                        bubbles.push(matches[i]);
-                        bubbles = matches[i].getClusterMatches(bubbles);
-                    }
-                }
-            }
-            
-            return bubbles;
-        }
-        
-        this.getCluster = function() {
-            
-            var matches = this.getClusterMatches();
-            
-            return {
-                "bubbles" : matches,
-                "size" : matches.length
-            }
-        }
-        
-        return ;
-    }
-    
-    function Grid() {
-        
-        this.grid = [];
-                
-        this.resetGrid = function() {
-            for(var i = 0 ; i < 11 ; i++) {
-                this.grid[i] = [];
-                for(var j = 0 ; j < 15 ; j++) {
-                    this.grid[i][j] = new Bubble(i,j,0);
-                }
-            }
-        }
-        
-        this.add = function(x,y,contents) {
-            
-            var bubble = new Bubble(x, y, contents);
-            
-        //    if(bubble.adjacentMatches(0).length < 6) //don't add falling pieces
-                this.grid[x][y] = bubble;
-        }
-        
-        this.countInRow = function(row) {
-            var count = 0;
-            for(var i = 0 ; i < 11 ; i++)
-                if(this.grid[i][row].color != 0)
-                    count++;
-            return count;
-        }
-        
-        this.lastRow = function() {
-            for(var i = 0 ; i < 15 ; i++) {
-                if(this.countInRow(i) == 0)
-                    return i - 1;
-            }
-            return 15;
-        }
-        
-        this.getColoredBubbles = function(color) {
-            var array = [];
-            for(var i = 0 ; i < 11 ; i++) {
-                for(var j = 0 ; j < 15 ; j++) {
-                    if(this.grid[i][j].color === color)
-                        array.push(this.grid[i][j]);
-                }
-            }
-            return array;
-        }
-        
-        this.alreadyInCollection = function(match, bubbles) {
-            for(var i = 0 ; i < bubbles.length ; i++)
-                if(bubbles[i].x == match.x && bubbles[i].y == match.y)
-                    return true;
-            return false;
-        }
-        
-        this.getPossibleShots = function(color) {
-                        
-            
-            var array = [];
-            for(var i = 0 ; i < 11 ; i++) {
-                for(var j = 0 ; j < 15 ; j++) {
-                    if(typeof this.grid[i] != "undefined" && typeof this.grid[i][j] != "undefined" && this.grid[i][j].color != 0 && this.grid[i][j].adjacentMatches(0).length > 0) {
-                        
-                        var matches = this.grid[i][j].adjacentMatches(0);
-                        for(var m = 0 ; m < matches.length ; m++) {
-                            if(!this.alreadyInCollection(matches[m],array))
-                                array.push(matches[m]);
-                        }                        
-                        
-                    }
-                }
-            }
-            
-            return array;
-        }
-        
-        this.bubblesSortedByDistance = function() {
-            var array = [];
-            for(var i = 0 ; i < 11 ; i++) {
-                for(var j = 0 ; j < 15 ; j++) {
-                    array.push(this.grid[i][j]);
-                }
-            }
-            
-            array.sort(function(a,b){
-                var distanceA = distanceBetweenPoints(a.getCenterX(),a.getCenterY(), rotationPointX, rotationPointY);
-                var distanceB = distanceBetweenPoints(b.getCenterX(),b.getCenterY(), rotationPointX, rotationPointY);
-                return distanceA - distanceB;
-            });
-            
-            return array;
-            
-        }
-        
-        this.availableShots = function() {
-            for(var i = 0 ; i < touchPoints.length ; i++) {
-                var touchPointX = touchPoints[i][0];
-                var touchPointY = touchPoints[i][1];
-            }
-        }
-        
-        return;
-    }
-      
+          
     window.onload = function() {
-        
-
-        
-        
-        
-        
-        
-        var colorArrayMatches = function(c1,c2) {
-            var dx = c1[0] - c2[0];
-            var dy = c1[1] - c2[1];
-            var dz = c1[2] - c2[2];
-            if ((c1[2] - c1[1]) >= 100 && (c1[0] - c1[2]) >= 60) {
-              return true;
-            }
-            return dx * dx + dy * dy + dz * dz < 3500;
-          }
-        
-        var getBubbleColor = function(iData) {
-            
-            var purple = [208,65,252];
-            var purpleCrossHair = [126,45,154];
-            var purpleCrossHair2 = [132,42,160];
-            var green = [66,192,1];
-            var green2 = [113,197,57];
-            var greenCrossHair = [53,109,21];
-            var orange = [247,156,0];
-            var orange2 = [240,172,58];
-            var orangeCrossHair = [145,87,17];
-            var lightblue = [50,162,240];
-            var lightblueCrossHair = [42,94,152];
-            var blue = [23,57,209];
-            var red = [203,44,34];
-            
                         
-            if(colorArrayMatches(iData.data,purple))
-                return "purple";
-            else if(colorArrayMatches(iData.data,purpleCrossHair))
-                return "purple";
-            else if(colorArrayMatches(iData.data,purpleCrossHair2))
-                return "purple";
-            else if(colorArrayMatches(iData.data,green))
-                return "green";
-            else if(colorArrayMatches(iData.data,green2))
-                return "green";
-            else if(colorArrayMatches(iData.data,greenCrossHair))
-                return "green";
-            else if(colorArrayMatches(iData.data,orange))
-                return "orange";
-            else if(colorArrayMatches(iData.data,orange2))
-                return "orange";
-            else if(colorArrayMatches(iData.data,orangeCrossHair))
-                return "orange";
-            else if(colorArrayMatches(iData.data,lightblue))
-                return "lightblue";
-            else if(colorArrayMatches(iData.data,lightblueCrossHair))
-                return "lightblue";
-            else if(colorArrayMatches(iData.data,blue))
-                return "blue";
-            else if(colorArrayMatches(iData.data,red))
-                return "red";
-            else
-                return false;
-        }
-        
-        
-        
         document.getElementById('iphone-screen-stream').setAttribute("style", "width: " + iPhoneScreenWidth + "px; height: " + iPhoneScreenHeight + "px;");
         document.getElementById('canvas').setAttribute("width", iPhoneScreenWidth);
         document.getElementById('canvas').setAttribute("height", iPhoneScreenHeight);
         
-
-                
       var canvas = document.getElementById('canvas');
-        context = canvas.getContext('2d');
+      context = canvas.getContext('2d');
       
-      
-      var video = document.getElementById('iphone-screen-stream');
-      
-      
-      
+      var video = document.getElementById('iphone-screen-stream');      
       
       context.strokeStyle = "#00901b";
       context.fillStyle = "#fff";
       context.font = '11px Helvetica';
-      
-      
-      
       
       tracking.ColorTracker.registerColor('darkgrey1', function(r, g, b) {
         var dx = r - 55;
@@ -535,9 +219,7 @@
         }
         return dx * dx + dy * dy + dz * dz < 3500;
       });
-      
-      
-      
+            
       var tracker = new tracking.ColorTracker(['darkgrey1','darkgrey2','greenbubble']);
       tracker.setMinDimension((5 / 416) * iPhoneScreenWidth);
       tracker.setMaxDimension((30 / 416) * iPhoneScreenWidth);
@@ -578,7 +260,6 @@
         context.strokeStyle = '#003300';
         context.stroke();
         
-        
         if(shooterBallColor === "purple") {
             context.fillStyle = 'purple';
             context.fill();
@@ -601,7 +282,6 @@
             context.fillStyle = 'transparent';
         }
         
-        
         context.beginPath();
         context.arc(centerX, centerY + onDeckOffset, radius, 0, 2 * Math.PI, false);
      //   context.fillStyle = 'red';
@@ -609,7 +289,6 @@
         context.lineWidth = 1;
         context.strokeStyle = '#003300';
         context.stroke();
-        
         
         if(onDeckBallColor === "purple") {
             context.fillStyle = 'purple';
@@ -632,7 +311,6 @@
         } else {
             context.fillStyle = 'transparent';
         }
-
             
         if(getBubbleColor(iData)) {
             grid.resetGrid();
@@ -694,90 +372,37 @@
                         
                    //     var possibleShots = grid.getPossibleShots('r');
                       //  if()
-                        
-                    
-                    
+                                            
               //      tracker.stop();
                     
                 //    }
                     
-                    
                 }
-                
                 
             }
-            
-            
-            var sortedBubbles = grid.bubblesSortedByDistance();
-            
-            var availableShots = [];
+                        
+            var availableShots = grid.availableShots();
             
             var intersectionCounter = 1;
-            for(var i = 0 ; i < touchPoints.length ; i++) {
-                var touchPointX = touchPoints[i][0];
-                var touchPointY = touchPoints[i][1];
+            for(var i = 0 ; i < availableShots.length ; i++) {
                 
-                var lastEmptyBubble = sortedBubbles[0];
+                var shot = availableShots[i];
                 
-                for(var s = 0 ; s < sortedBubbles.length ; s++ ) {
-                    
-                    
-                    var shot = sortedBubbles[s];
-                                   
-                    
-                    var centerX = 68 + shot.x * gridSpacing;
-                    var centerY = 204 + shot.y * gridSpacing;
-                    
-                    if(shot.y % 2 === 1)
-                        centerX += gridSpacing / 2;
-                    
-                    var radius = gridSpacing / 2;
-                    
-                    
-                    deltaX = rotationPointX - touchPointX;
-                    deltaY = rotationPointY - touchPointY;
-                                    
-                    if(deltaX != 0)
-                        m = deltaY / deltaX;
-                    else
-                        m = 100000;
-                    
-                    var n = rotationPointY - m * rotationPointX;
-                    
-                    var intersections = findCircleLineIntersections(radius, centerX, centerY, m, n);
-                                    
-                    if(intersections.length !== 0) {
-                        if(shot.color !== 0) {
-                            
-                            availableShots.push(shot);
-                            
-                            context.beginPath();
-                            context.arc(lastEmptyBubble.getCenterX(), lastEmptyBubble.getCenterY(), radius, 0, 2 * Math.PI, false);
-                            context.fillStyle = 'rgba(0,0,0,.5)';
-                            
-                            context.fill();
-                            context.lineWidth = 1;
-                            context.strokeStyle = '#003300';
-                            context.stroke();
-                            
-                            context.fillStyle = "white";
-                            context.textAlign = "center";
-                            context.fillText(intersectionCounter++, lastEmptyBubble.getCenterX(), lastEmptyBubble.getCenterY()); 
-                            
-                            break;
-                        
-                        } else {
-                            lastEmptyBubble = shot;
-                        }
-                    }
-                }
-           
-           }
-           
-           
+                context.beginPath();
+                context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
+                context.fillStyle = 'rgba(0,0,0,.5)';
+                
+                context.fill();
+                context.lineWidth = 1;
+                context.strokeStyle = '#003300';
+                context.stroke();
+                
+                context.fillStyle = "white";
+                context.textAlign = "center";
+                context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
+            }           
             
         }
-        console.log(availableShots);
         
         //draw theoritical lines
         
@@ -829,40 +454,6 @@
         
         
         
-        
-      /*  
-        deltaX = rotationPointX - leftWall;
-        deltaY = rotationPointY - 200;
-        
-        var deltaR = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        if(deltaX != 0)
-            m = deltaY / deltaX;
-        else
-            m = 100000;
-        
-        b = rect.y - m * rect.x;
-        
-        
-        var D = rotationPointX * 200 - leftWall * rotationPointY;
-        
-        var sgn = 1;
-        if(deltaY < 0)
-            sgn = -1;
-            
-        var intersectionX_1 = (D * deltaY + sgn * deltaX * Math.sqrt(radius * radius * deltaR * deltaR - D * D)) / (deltaR * deltaR);
-        var intersectionX_2 = (D * deltaY - sgn * deltaX * Math.sqrt(radius * radius * deltaR * deltaR - D * D)) / (deltaR * deltaR);
-        
-        
-        var intersectionY_1 = (D * deltaX + Math.abs( deltaY ) * Math.sqrt(radius * radius * deltaR * deltaR - D * D)) / (deltaR * deltaR);
-        var intersectionY_2 = (D * deltaX - Math.abs( deltaY ) * Math.sqrt(radius * radius * deltaR * deltaR - D * D)) / (deltaR * deltaR);
-        
-        console.log()
-        */
-        //end theoritical lines
-        
-        
-   //     console.log(grid);
                 
         context.beginPath();
         context.moveTo(leftWall, 0);
@@ -877,12 +468,8 @@
         context.stroke();
         
         context.strokeRect(rotationPointX * .75, rotationPointY, rotationPointX * 1.25 - rotationPointX * .75, rotationPointY * .9 - rotationPointY);
-        
-        
-        
-        
+                
         event.data.forEach(function(rect) {
-                        
             
             context.strokeStyle = "#fff";
             
@@ -890,12 +477,9 @@
             rect.color = tracker.customColor;
           }
           
-          
           if( (rect.x > rotationPointX * .75 && rect.x < rotationPointX * 1.25 && rect.y > rotationPointY * .9 && rect.y < rotationPointY) && rect.color != "greenbubble") {
           
-              
-              
-              
+                            
               //top left
               context.beginPath();
               context.moveTo(rotationPointX - (rect.width) / 2, rotationPointY - (rect.height) / 2);
@@ -927,7 +511,6 @@
               context.lineTo( wallB / m , 0 );          
               context.stroke();
               
-              
               //bottom right
               context.beginPath();
               context.moveTo(rotationPointX + (rect.width) / 2, rotationPointY + (rect.height) / 2);
@@ -958,10 +541,7 @@
                         
               context.lineTo( wallB / m , 0 ); 
               context.stroke();
-                        
-              
-              
-              
+                                      
               //top right
               context.beginPath();
               context.moveTo(rotationPointX + (rect.width) / 2, rotationPointY - (rect.height) / 2);
@@ -975,14 +555,12 @@
               else
                 m = .0001;
               
-              
               b = (rect.y) - m * (rect.x + rect.width);
               
               if(m < 0)
                 wall = rightWall;
               else
                 wall = leftWall;
-              
               
               wallX = wall;
               wallY = m * wall + b;
@@ -993,7 +571,6 @@
                         
               context.lineTo( wallB / m , 0 ); 
               context.stroke();
-              
               
               //bottom left
               context.beginPath();
@@ -1026,15 +603,12 @@
               context.lineTo( wallB / m , 0 );          
               context.stroke();
               
-          
           }
           
         });
       });
-   //   initGUIControllers(tracker);
     };
   </script>
-
 
 </body>
 </html>
