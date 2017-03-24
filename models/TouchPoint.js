@@ -19,5 +19,5 @@ for(var i = leftWall ; i <= rightWall ; i+=5) {
 
 for(var i = 100 ; i < rotationPointY ; i+=5) {
     var touchPoint = new TouchPoint(rightWall,i);        
-    touchPoints.push(touchPoint);  
+    touchPoints.push(touchPoint);
 }  

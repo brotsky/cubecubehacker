@@ -27,6 +27,8 @@ var leftWall = (30 / 416) * iPhoneScreenWidth;
 var rotationPointX = (208 / 416) * iPhoneScreenWidth;
 var rotationPointY = (610 / 738) * iPhoneScreenHeight; 
 
+var shooterBallColor, onDeckBallColor;
+
 </script>
 
 <script src="models/Bubble.js"></script>
@@ -244,8 +246,8 @@ var rotationPointY = (610 / 738) * iPhoneScreenHeight;
         
         var onDeckData = videoContext.getImageData(rotationPointX, rotationPointY + onDeckOffset, 1, 1);
         
-        var shooterBallColor = getBubbleColor(iData);
-        var onDeckBallColor = getBubbleColor(onDeckData);
+        shooterBallColor = getBubbleColor(iData);
+        onDeckBallColor = getBubbleColor(onDeckData);
         
         var centerX = rotationPointX;
         var centerY = rotationPointY;
@@ -443,6 +445,28 @@ var rotationPointY = (610 / 738) * iPhoneScreenHeight;
             context.strokeStyle = "#000";
         }
         
+        
+        var bestShot = grid.bestShot();
+        
+        if(bestShot) {
+            if(typeof bestShot.touchPoints != "undefined" && bestShot.touchPoints.length > 0) {
+                
+                context.strokeStyle = "#ff0096";
+                for(var i = 0 ; i < bestShot.touchPoints.length ; i++) {
+                    context.beginPath();
+                    context.moveTo(bestShot.touchPoints[i].touchPoint.x, bestShot.touchPoints[i].touchPoint.y);
+                    context.lineTo(rotationPointX,rotationPointY);
+                    context.closePath();
+                    context.stroke();
+                }
+                
+                
+                context.strokeStyle = "#000";
+            }
+        }
+        
+        
+        /*
         context.strokeStyle = "#ff0096";
         context.beginPath();
         context.moveTo(rightWall, 300);
@@ -451,7 +475,7 @@ var rotationPointY = (610 / 738) * iPhoneScreenHeight;
         context.stroke();
         lineCounter++;
         context.strokeStyle = "#000";
-        
+        */
         
         
                 

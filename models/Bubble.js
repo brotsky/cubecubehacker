@@ -81,18 +81,22 @@ function Bubble(x,y,color) {
     }
 
     
-    this.getClusterMatches = function(bubbles) {
+    this.getClusterMatches = function(bubbles, colorToMatch) {
+        
+        if(colorToMatch == null)
+            colorToMatch = this.color;
+        
         var bubbles = bubbles;
         if(bubbles == null)
             bubbles = [this];
-        var matches = this.adjacentMatches();
+        var matches = this.adjacentMatches(colorToMatch);
         if(matches.length === 0)
             return bubbles;
         else {
             for(var i = 0 ; i < matches.length ; i++) {
                 if(!this.alreadyInCluster(matches[i],bubbles)) {
                     bubbles.push(matches[i]);
-                    bubbles = matches[i].getClusterMatches(bubbles);
+                    bubbles = matches[i].getClusterMatches(bubbles, colorToMatch);
                 }
             }
         }
@@ -100,9 +104,12 @@ function Bubble(x,y,color) {
         return bubbles;
     }
     
-    this.getCluster = function() {
+    this.getCluster = function(colorToMatch) {
         
-        var matches = this.getClusterMatches();
+        if(colorToMatch == null)
+            colorToMatch = this.color;
+        
+        var matches = this.getClusterMatches(); //we need to add colorToMatch
         
         return {
             "bubbles" : matches,
@@ -110,5 +117,14 @@ function Bubble(x,y,color) {
         }
     }
     
-    return ;
+    this.touchPoints = [];
+    
+    this.addTouchPoint = function(touchPoint,hasBounce) {
+        this.touchPoints.push({
+            "touchPoint" : touchPoint,
+            "hasBounce" : hasBounce
+        });
+    }
+    
+    return;
 }

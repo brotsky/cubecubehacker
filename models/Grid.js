@@ -99,8 +99,10 @@ function Grid() {
         
         for(var i = 0 ; i < touchPoints.length ; i++) {
             
-            var touchPointX = touchPoints[i].x;
-            var touchPointY = touchPoints[i].y;
+            var touchPoint = touchPoints[i];
+            
+            var touchPointX = touchPoint.x;
+            var touchPointY = touchPoint.y;
                             
             for(var s = 0 ; s < sortedBubbles.length ; s++ ) {
                 
@@ -124,11 +126,18 @@ function Grid() {
                 
                 var n = rotationPointY - m * rotationPointX;
                 
-                var intersections = findCircleLineIntersections(radius, centerX, centerY, m, n);
-                if(intersections.length === 0 && (touchPointX === rightWall || touchPointX === leftWall)) {
+                var intersections = [];
+                
+                intersections = findCircleLineIntersections(radius, centerX, centerY, m, n);
+                
+                var hasBounce = false;
+                
+                if(intersections.length === 0 && (touchPointX === rightWall || touchPointX === leftWall) ) {
                     m = -1 * m;
                     n = touchPointY - m * touchPointX;
                     intersections = findCircleLineIntersections(radius, centerX, centerY, m, n);
+                    
+                    hasBounce = true;
                 }
                 
                 if(intersections.length !== 0) {
@@ -138,8 +147,11 @@ function Grid() {
                         if(shot.y === 0)
                             shotToRecord = shot;
                         
-                        if(!this.alreadyInCollection(shotToRecord,array) && shotToRecord.color === 0 && (shotToRecord.countFilledNeighbors() > 0 || shotToRecord.y === 0))
-                            array.push(shotToRecord);
+                        if(shotToRecord.color === 0 && (shotToRecord.countFilledNeighbors() > 0 || shotToRecord.y === 0)) {
+                            shotToRecord.addTouchPoint(touchPoint,hasBounce);
+                            if(!this.alreadyInCollection(shotToRecord,array))
+                                array.push(shotToRecord);
+                        }
                         break;
                     } else {
                         lastEmptyBubble = shot;
@@ -150,6 +162,26 @@ function Grid() {
         
         return array;
         
+    }
+    
+    this.bestShot = function() {
+        var shots = this.availableShots();
+        
+        for(var i = 0 ; i < shots.length ; i++) {
+            //choose shots with a match
+            
+            var adjacentMatches = shots[i].adjacentMatches(shooterBallColor);
+            
+            console.log(shots[i].getCluster(shooterBallColor));
+            
+            if(adjacentMatches.length !== 0)
+                return shots[i];            
+        }
+                
+        if(shots.length > 0 && typeof shots[0] !== "undefined")
+            return shots[0];
+        else
+            return false;
     }
     
     return;
