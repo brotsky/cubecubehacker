@@ -24,6 +24,9 @@ function Bubble(x,y,color) {
             points += unattachedCluster.length * 100;            
         }
         
+        //prioritize shots that are higher up if they have the same points
+        points += (15 - this.y) / 100;
+        
         return points;
     }
     
@@ -148,6 +151,23 @@ function Bubble(x,y,color) {
             "touchPoint" : touchPoint,
             "hasBounce" : hasBounce
         });
+    }
+    
+    this.bestTouchPoint = function() {
+        
+        var withBounce = [];
+        var withoutBounce = [];
+        
+        for(var i = 0 ; i < this.touchPoints.length ; i++) {
+            if(this.touchPoints[i].hasBounce)
+                withBounce.push(this.touchPoints[i]);
+            else
+                withoutBounce.push(this.touchPoints[i]);
+        }
+        
+        
+        
+        console.log(this.touchPoints);
     }
     
     this.getClusterAnyColor = function(bubbles, withOutCluster) {
