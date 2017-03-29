@@ -19,6 +19,7 @@ var getBubbleColor = function(iData) {
     var orange = [247,156,0];
     var orange2 = [240,172,58];
     var orangeCrossHair = [145,87,17];
+    var orangeCrossHair2 = [147,84,18];
     var lightblue = [50,162,240];
     var lightblueCrossHair = [42,94,152];
     var blue = [23,57,209];
@@ -42,6 +43,8 @@ var getBubbleColor = function(iData) {
     else if(colorArrayMatches(iData.data,orange2))
         return "orange";
     else if(colorArrayMatches(iData.data,orangeCrossHair))
+        return "orange";
+    else if(colorArrayMatches(iData.data,orangeCrossHair2))
         return "orange";
     else if(colorArrayMatches(iData.data,lightblue))
         return "lightblue";

@@ -148,6 +148,16 @@ var shooterBallColor, onDeckBallColor;
       display: none;
   }
   
+  #shot-ranking {
+      position: fixed;
+      top: 100px;
+      left: 0;
+  }
+  
+  #shot-ranking ul {
+      list-style: none;
+  }
+  
 </style>
 </head>
 <body>
@@ -159,6 +169,10 @@ var shooterBallColor, onDeckBallColor;
   
   <p><button id="enable-capture">Enable Capture</button></p>
   
+  <div id="shot-ranking">
+      <ul>
+      </ul>
+  </div>
   
 <button onclick="shoot()" style="width: 64px;border: solid 2px #ccc;">Capture</button>
   
@@ -382,13 +396,19 @@ var shooterBallColor, onDeckBallColor;
                 }
                 
             }
-                        
+            
+            $("#shot-ranking ul").empty();
+            
+            var shotRankingHtml = "";
+            
             var availableShots = grid.availableShots();
             
             var intersectionCounter = 1;
             for(var i = 0 ; i < availableShots.length ; i++) {
-                
+                                
                 var shot = availableShots[i];
+                
+                shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + " pts</li>";
                 
                 context.beginPath();
                 context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
@@ -404,7 +424,11 @@ var shooterBallColor, onDeckBallColor;
                 context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
             }           
             
+            $("#shot-ranking ul").html(shotRankingHtml);
+            
         }
+        
+        
         
         //draw theoritical lines
         

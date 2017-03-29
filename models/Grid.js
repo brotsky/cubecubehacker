@@ -76,6 +76,7 @@ function Grid() {
         var array = [];
         for(var i = 0 ; i < 11 ; i++) {
             for(var j = 0 ; j < 15 ; j++) {
+                if(typeof this.grid[i][j] != "undefined")
                 array.push(this.grid[i][j]);
             }
         }
@@ -88,6 +89,40 @@ function Grid() {
         
         return array;
         
+    }
+
+    this.currentBubbles = function() {
+        var array = [];
+        for(var i = 0 ; i < 11 ; i++) {
+            for(var j = 0 ; j < 15 ; j++) {
+                if(typeof this.grid[i][j] != "undefined" && this.grid[i][j].color !== 0)
+                array.push(this.grid[i][j]);
+            }
+        }
+        
+        return array;
+        
+    }
+    
+    //used for validation
+    this.checkAvailableShots = function(availableShots) {
+        var array = [];
+                
+        for(var i = 0 ; i < availableShots.length ; i++) {
+            
+            var passed = true;
+                  
+            if(availableShots[i].countFilledNeighbors() === 6)
+                passed = false;
+                
+            if(availableShots[i].y === 0 && availableShots[i].countFilledNeighbors() === 4)
+                passed = false;
+            
+            if(passed)
+                array.push(availableShots[i]);
+        }
+        
+        return array;
     }
     
     this.availableShots = function() {
@@ -160,28 +195,28 @@ function Grid() {
             }
         }
         
-        return array;
+        //validate the available shots
+        return this.checkAvailableShots(array);
         
     }
     
     this.bestShot = function() {
         var shots = this.availableShots();
         
+        var mostPoints = 0;
+        var shotWithMostPoints = false;
+        
         for(var i = 0 ; i < shots.length ; i++) {
-            //choose shots with a match
             
-            var adjacentMatches = shots[i].adjacentMatches(shooterBallColor);
+            var points = shots[i].points();
             
-            console.log(shots[i].getCluster(shooterBallColor));
-            
-            if(adjacentMatches.length !== 0)
-                return shots[i];            
+            if(points > mostPoints) {
+                mostPoints = points;
+                shotWithMostPoints = shots[i];
+            }
         }
                 
-        if(shots.length > 0 && typeof shots[0] !== "undefined")
-            return shots[0];
-        else
-            return false;
+        return shotWithMostPoints;
     }
     
     return;

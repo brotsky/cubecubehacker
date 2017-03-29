@@ -2,6 +2,31 @@ function Bubble(x,y,color) {
     
     this.x = x;
     this.y = y;
+    this.points = function() {
+        
+        var points = 0;
+        
+        if(this.color !== 0)
+            return points;
+        
+        var cluster = this.getCluster(shooterBallColor);
+                
+        for(var i = 0 ; i < cluster.size ; i++) {
+            if(i < 3)
+                points += 10;
+            else
+                points += 10 * (i - 2);
+        }
+        
+        if(cluster.size > 2) {
+            var unattachedCluster = this.getUnattachedCluster(cluster.bubbles);
+            
+            points += unattachedCluster.length * 100;            
+        }
+        
+        return points;
+    }
+    
     this.getCenterX = function() {
         var centerX = 68 + this.x * gridSpacing;
         
@@ -80,7 +105,6 @@ function Bubble(x,y,color) {
         return false;
     }
 
-    
     this.getClusterMatches = function(bubbles, colorToMatch) {
         
         if(colorToMatch == null)
@@ -109,7 +133,7 @@ function Bubble(x,y,color) {
         if(colorToMatch == null)
             colorToMatch = this.color;
         
-        var matches = this.getClusterMatches(); //we need to add colorToMatch
+        var matches = this.getClusterMatches([this],colorToMatch); //we need to add colorToMatch
         
         return {
             "bubbles" : matches,
@@ -124,6 +148,82 @@ function Bubble(x,y,color) {
             "touchPoint" : touchPoint,
             "hasBounce" : hasBounce
         });
+    }
+    
+    this.getClusterAnyColor = function(bubbles, withOutCluster) {
+        var bubbles = bubbles;
+        if(bubbles === null)
+            bubbles = [this];
+                
+        var withOutCluster = withOutCluster;
+        
+        if(typeof withOutCluster === "undefined")
+            withOutCluster = [];
+                
+        var adjacentMatches = this.adjacentSpaces();
+        
+        var matches = [];
+        for(var i = 0 ; i < adjacentMatches.length ; i++) {
+            if(adjacentMatches[i].color !== 0) {
+                if(withOutCluster !== false) {
+                    if(!this.alreadyInCluster(adjacentMatches[i],withOutCluster))
+                        matches.push(adjacentMatches[i]);
+                } else {
+                    matches.push(adjacentMatches[i]);
+                }                
+            }
+        }
+        
+        if(matches.length === 0)
+            return bubbles;
+        else {
+            for(var i = 0 ; i < matches.length ; i++) {
+                if(!this.alreadyInCluster(matches[i],bubbles)) {
+                    bubbles.push(matches[i]);
+                    bubbles = matches[i].getClusterAnyColor(bubbles, withOutCluster);
+                }
+            }
+        }
+        
+        return bubbles;
+    }
+    
+    this.connectedToTop = function(withOutCluster) {
+                        
+        var withOutCluster = withOutCluster;
+        
+        if(typeof withOutCluster === "undefined")
+            withOutCluster = [];
+        
+        var adjacent = this.adjacentSpaces();
+        
+        if(this.color === 0)
+            return false;
+        
+        if(this.y === 0)
+            return true;
+                    
+        var cluster = this.getClusterAnyColor([],withOutCluster);
+        
+        for(var i = 0 ; i < cluster.length ; i++) {
+            if(cluster[i].y === 0)
+                return true;
+        }
+        
+        return false;
+    }
+    
+    this.getUnattachedCluster = function(withOutCluster) {
+        var array = [];
+        
+        var currentBubbles = grid.currentBubbles();
+        
+        for(var i = 0 ; i < currentBubbles.length ; i++) {
+            if(!currentBubbles[i].connectedToTop(withOutCluster) && !this.alreadyInCluster(currentBubbles[i],withOutCluster))
+                array.push(currentBubbles[i]);
+        }
+        
+        return array;
     }
     
     return;
