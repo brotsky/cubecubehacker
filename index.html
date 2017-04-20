@@ -397,6 +397,10 @@ var shooterBallColor, onDeckBallColor;
                 
             }
             
+            grid.validateGrid();
+            
+            //create bubbles after validation
+            
             $("#shot-ranking ul").empty();
             
             var shotRankingHtml = "";
@@ -472,6 +476,7 @@ var shooterBallColor, onDeckBallColor;
         
         var bestShot = grid.bestShot();
         
+        
         if(bestShot) {
             if(typeof bestShot.touchPoints != "undefined" && bestShot.touchPoints.length > 0) {
                 
@@ -484,6 +489,25 @@ var shooterBallColor, onDeckBallColor;
                     context.stroke();
                 }
                 
+                
+                context.strokeStyle = "#000";
+            }
+        }
+        
+        var bestTouchPoint = bestShot.bestTouchPoint();
+        
+        
+        if(bestTouchPoint) {
+            if(typeof bestTouchPoint != "undefined") {
+                
+                context.strokeStyle = "#000";
+                
+                context.beginPath();
+                context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
+                context.lineTo(rotationPointX,rotationPointY);
+                context.closePath();
+                context.stroke();
+            
                 
                 context.strokeStyle = "#000";
             }

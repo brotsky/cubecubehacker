@@ -153,6 +153,24 @@ function Bubble(x,y,color) {
         });
     }
     
+    this.averageTouchPointX = function(touchPoints) {
+        var sum = 0;
+        
+        for(var i = 0 ; i < touchPoints.length ; i++)
+            sum += touchPoints[i].touchPoint.x;
+        
+        return sum / touchPoints.length;
+    }
+    
+    this.averageTouchPointY = function(touchPoints) {
+        var sum = 0;
+        
+        for(var i = 0 ; i < touchPoints.length ; i++)
+            sum += touchPoints[i].touchPoint.y;
+        
+        return sum / touchPoints.length;
+    }
+    
     this.bestTouchPoint = function() {
         
         var withBounce = [];
@@ -165,9 +183,19 @@ function Bubble(x,y,color) {
                 withoutBounce.push(this.touchPoints[i]);
         }
         
+        if(withoutBounce.length > 0) {
+                        
+            var touchPoint = new TouchPoint(this.averageTouchPointX(withoutBounce), this.averageTouchPointY(withoutBounce));
+            
+            return touchPoint;
+        } else if(withBounce.length > 0) {
+            var touchPoint = new TouchPoint(this.averageTouchPointX(withBounce), this.averageTouchPointY(withBounce));
+            
+            return touchPoint;
+        }
         
         
-        console.log(this.touchPoints);
+        return false;
     }
     
     this.getClusterAnyColor = function(bubbles, withOutCluster) {

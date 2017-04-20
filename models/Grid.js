@@ -19,6 +19,16 @@ function Grid() {
             this.grid[x][y] = bubble;
     }
     
+    this.validateGrid = function() {
+        for(var i = 0 ; i < 11 ; i++) {
+            for(var j = 0 ; j < 15 ; j++) {
+                var bubble = this.grid[i][j];
+                if(!bubble.connectedToTop())
+                    this.grid[i][j].color = 0;
+            }
+        }
+    }
+    
     this.countInRow = function(row) {
         var count = 0;
         for(var i = 0 ; i < 11 ; i++)
@@ -101,7 +111,6 @@ function Grid() {
         }
         
         return array;
-        
     }
     
     //used for validation
@@ -217,6 +226,22 @@ function Grid() {
         }
                 
         return shotWithMostPoints;
+    }
+    
+    this.currentColors = function() {
+        var currentBubbles = this.currentBubbles();
+        
+        var colors = [];
+        
+        for(var i = 0 ; i < currentBubbles.length ; i++)
+            if( colors.indexOf(currentBubbles[i].color) === -1 )
+                colors.push(currentBubbles[i].color);
+        
+        return colors;
+    }
+    
+    this.colorCount = function() {        
+        return this.currentColors().length;        
     }
     
     return;

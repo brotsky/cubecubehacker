@@ -109,7 +109,7 @@ function showSources() {
     //  console.log("Name: " + source.name);
       
       
-      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo")
+      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo" || source.name == "shooter play demo 4")
         addSource(source);
     }
   });
