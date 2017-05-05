@@ -86,7 +86,7 @@ function Grid() {
         var array = [];
         for(var i = 0 ; i < 11 ; i++) {
             for(var j = 0 ; j < 15 ; j++) {
-                if(typeof this.grid[i][j] != "undefined")
+                if(typeof this.grid[i] != "undefined" && typeof this.grid[i][j] != "undefined")
                 array.push(this.grid[i][j]);
             }
         }
@@ -172,14 +172,14 @@ function Grid() {
                 
                 var intersections = [];
                 
-                intersections = findCircleLineIntersections(radius, centerX, centerY, m, n);
+                intersections = findCircleLineIntersections(radius * bubbleIntersectionRadius, centerX, centerY, m, n);
                 
                 var hasBounce = false;
                 
                 if(intersections.length === 0 && (touchPointX === rightWall || touchPointX === leftWall) ) {
                     m = -1 * m;
                     n = touchPointY - m * touchPointX;
-                    intersections = findCircleLineIntersections(radius, centerX, centerY, m, n);
+                    intersections = findCircleLineIntersections(radius * bubbleIntersectionRadius, centerX, centerY, m, n);
                     
                     hasBounce = true;
                 }
@@ -203,7 +203,7 @@ function Grid() {
                 }
             }
         }
-        
+                
         //validate the available shots
         return this.checkAvailableShots(array);
         

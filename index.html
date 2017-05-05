@@ -7,9 +7,31 @@
 <script src="node_modules/dat.gui/build/dat.gui.min.js"></script>
 
 <script src="stats.min.js"></script>
-  <script src="color_camera_gui.js"></script>
+<script src="color_camera_gui.js"></script>
+<script src="speakClient.js"></script>
 
 <script type="text/javascript">
+    
+    var Tesseract = require('tesseract.js');
+    
+    const exec = require('child_process').exec;
+
+    var command = "/usr/local/bin/axi up; /usr/local/bin/axi home;";
+        
+    console.log(command);
+            
+    exec(command,(error, stdout, stderr) => {
+          if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+          }
+          console.log(`stdout: ${stdout}`);
+          console.log(`stderr: ${stderr}`);
+        });
+
+
+   // exec('say -v Alex "Hello" -r 200');
+    
 //globals
   
 var gridSpacing = 46.75;
@@ -21,6 +43,12 @@ var m, b, deltaX, deltaY, wall, wallX, wallY, wallB, iData;
 var iPhoneScreenWidth = 416 * 1.5;
 var iPhoneScreenHeight = 738 * 1.5;
 
+var iPhoneScreenWidthInches = 2.7 * 2;
+var iPhoneScreenHeightInches = 4.8 * 2;
+
+var widthRatio = iPhoneScreenWidthInches / iPhoneScreenWidth;
+var heightRatio = iPhoneScreenHeightInches / iPhoneScreenHeight;
+
 var rightWall = (391 / 416) * iPhoneScreenWidth;
 var leftWall = (30 / 416) * iPhoneScreenWidth;
         
@@ -28,6 +56,26 @@ var rotationPointX = (208 / 416) * iPhoneScreenWidth;
 var rotationPointY = (610 / 738) * iPhoneScreenHeight; 
 
 var shooterBallColor, onDeckBallColor;
+
+var bestTouchPointTemp = null;
+
+var bubbleIntersectionRadius = 1.5;
+
+var debug = false;
+setTimeout(function(){
+command = " /usr/local/bin/axi goto " + iPhoneScreenWidthInches + " " + iPhoneScreenHeightInches + ";";
+    
+console.log(command);
+        
+exec(command,(error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
+    });
+}, 2000);
 
 </script>
 
@@ -144,6 +192,10 @@ var shooterBallColor, onDeckBallColor;
     position: absolute;
   }
   
+  #timer {
+      z-index: 10000;
+  }
+  
   #output-container {
       display: none;
   }
@@ -166,6 +218,7 @@ var shooterBallColor, onDeckBallColor;
   <video id="iphone-screen-stream" autoplay></video>
   
   <canvas id="canvas" width="416" height="738"></canvas>
+  <canvas id="timer" width="50" height="50"></canvas>
   
   <p><button id="enable-capture">Enable Capture</button></p>
   
@@ -199,6 +252,8 @@ var shooterBallColor, onDeckBallColor;
         
       var canvas = document.getElementById('canvas');
       context = canvas.getContext('2d');
+      
+      var timerCanvas = document.getElementById("timer");
       
       var video = document.getElementById('iphone-screen-stream');      
       
@@ -243,6 +298,7 @@ var shooterBallColor, onDeckBallColor;
       tracker.on('track', function(event) {
           
           
+          
            var w = iPhoneScreenWidth;
                     var h = iPhoneScreenHeight;
                     var videoCanvas = document.createElement('canvas');
@@ -251,17 +307,27 @@ var shooterBallColor, onDeckBallColor;
           
           var videoContext = videoCanvas.getContext('2d');
                     videoContext.drawImage(video, 0, 0, w, h);
-                    
+        
+        
+        var timerContext = videoCanvas.getContext('2d');
+            timerContext.drawImage(video,200,400,50,50);
+        
+        
         context.clearRect(0, 0, canvas.width, canvas.height);
         
-        iData = videoContext.getImageData(rotationPointX, rotationPointY, 1, 1);
-        
         var onDeckOffset = 74;
+        
+        iData = videoContext.getImageData(rotationPointX + onDeckOffset * .2, rotationPointY, 1, 1);
+        
+        
         
         var onDeckData = videoContext.getImageData(rotationPointX, rotationPointY + onDeckOffset, 1, 1);
         
         shooterBallColor = getBubbleColor(iData);
         onDeckBallColor = getBubbleColor(onDeckData);
+        
+        
+        
         
         var centerX = rotationPointX;
         var centerY = rotationPointY;
@@ -352,7 +418,9 @@ var shooterBallColor, onDeckBallColor;
                     
                  //   if(i == 2 && j == 0) {
                     
-                
+                        
+                        
+                        
                         iData = videoContext.getImageData(centerX, centerY, 1, 1);
                         
                         var bubbleColor = getBubbleColor(iData);
@@ -437,6 +505,9 @@ var shooterBallColor, onDeckBallColor;
         //draw theoritical lines
         
         if(showLines) {
+            
+            
+            
             context.strokeStyle = "#ff0096";
             
             var lineCounter = 0;
@@ -492,27 +563,46 @@ var shooterBallColor, onDeckBallColor;
                 
                 context.strokeStyle = "#000";
             }
-        }
-        
-        var bestTouchPoint = bestShot.bestTouchPoint();
         
         
-        if(bestTouchPoint) {
-            if(typeof bestTouchPoint != "undefined") {
-                
-                context.strokeStyle = "#000";
-                
-                context.beginPath();
-                context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
-                context.lineTo(rotationPointX,rotationPointY);
-                context.closePath();
-                context.stroke();
+            var bestTouchPoint = bestShot.bestTouchPoint();
             
-                
-                context.strokeStyle = "#000";
+            if(!shooterBallColor) {
+                bestTouchPoint = false;
+                bestTouchPointTemp = bestTouchPoint;
             }
-        }
+            
+            if(bestTouchPoint) {
+                if(bestTouchPointTemp == null)
+                    bestTouchPointTemp = bestTouchPoint;
+                
+                
+                
+                if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
+                    bestTouchPointTemp = bestTouchPoint;
+                    
+                    bestTouchPoint.moveRobot();
+                    
+                    
+                    
+                }
+
+                if(typeof bestTouchPoint != "undefined") {
+                    
+                    context.strokeStyle = "#000";
+                    
+                    context.beginPath();
+                    context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
+                    context.lineTo(rotationPointX,rotationPointY);
+                    context.closePath();
+                    context.stroke();
+                
+                    
+                    context.strokeStyle = "#000";
+                }
+            }
         
+        }
         
         /*
         context.strokeStyle = "#ff0096";
@@ -679,8 +769,45 @@ var shooterBallColor, onDeckBallColor;
           
         });
       });
+      
+      
+      function printMousePos(event) {
+            
+            var canvas = document.getElementById("canvas");
+            
+            var x = event.clientX - canvas.offsetLeft;
+            var y = event.clientY - canvas.offsetTop;
+            
+            console.log("canvasX: " + x +
+            " - canvasY: " + y);
+            
+            
+            var robot_x = widthRatio * x;
+            var robot_y = heightRatio * y;
+            
+            
+            var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
+            
+            console.log(command);
+            
+            exec(command,(error, stdout, stderr) => {
+                  if (error) {
+                    console.error(`exec error: ${error}`);
+                    return;
+                  }
+                  console.log(`stdout: ${stdout}`);
+                  console.log(`stderr: ${stderr}`);
+                });
+            
+            
+            
+        }
+        
+        document.getElementById("canvas").addEventListener("click", printMousePos);
+      
+      
     };
   </script>
-
+  <div id="audio"></div>
 </body>
 </html>

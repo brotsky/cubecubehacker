@@ -14,6 +14,7 @@
 
 const {desktopCapturer} = require('electron');
 
+
 let desktopSharing = false;
 let localStream;
 
@@ -109,16 +110,33 @@ function showSources() {
     //  console.log("Name: " + source.name);
       
       
-      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo" || source.name == "shooter play demo 4")
+      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo" || source.name == "shooter play demo 4" || source.name == "debugger") {
+          
+          if(source.name == "debugger")
+            debug = true;
+          
         addSource(source);
+        }
     }
   });
 }
 
 function toggle() {
   if (!desktopSharing) {
-    var id = ($('select').val()).replace(/window|screen/g, function(match) { return match + ":"; });
-    onAccessApproved(id);
+      
+      
+      console.log($('select').val());
+      
+      var id = false;
+      
+      if($('select').val() !== null) {
+        id = ($('select').val()).replace(/window|screen/g, function(match) { return match + ":"; });
+        onAccessApproved(id);
+    }
+        else 
+            setTimeout(toggle, 100);
+        
+    
   } else {
     desktopSharing = false;
 
@@ -913,3 +931,4 @@ $(window).load(function(){
 document.getElementById('enable-capture').addEventListener('click', function(e) {
   toggle();
 });
+
