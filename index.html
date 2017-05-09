@@ -2,7 +2,6 @@
 <head>
 <link href="image-picker.css" rel="stylesheet">
 <script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="image-picker.min.js"></script>
 <script type="text/javascript" src="node_modules/tracking/build/tracking-min.js"></script>
 <script src="node_modules/dat.gui/build/dat.gui.min.js"></script>
 
@@ -277,15 +276,10 @@ exec(command,(error, stdout, stderr) => {
       context.strokeStyle = "#00901b";
       context.fillStyle = "#fff";
       context.font = '11px Helvetica';
-      
-      
-      
-      
+            
       var readScreen = function(delay) {
-            setTimeout(function(){
            
                     videoContext.drawImage(video, 0, 0, w, h);
-        
         
                     var timerContext = videoCanvas.getContext('2d');
                         timerContext.drawImage(video,200,400,50,50);
@@ -293,7 +287,7 @@ exec(command,(error, stdout, stderr) => {
                     context.clearRect(0, 0, canvas.width, canvas.height);
                             
                     if(!isPlayingShooter(videoContext)) {
-                        readScreen(delay);
+                        setTimeout(readScreen,delay);
                         return;
                     }
             
@@ -391,8 +385,10 @@ exec(command,(error, stdout, stderr) => {
                         
                         //create bubbles after validation
                         
-                        $("#shot-ranking ul").empty();
+                        var shotRanking = document.getElementById("shot-ranking");
                         
+                        shotRanking.innerHTML = "";
+                                                
                         var shotRankingHtml = "";
                         
                         var availableShots = grid.availableShots();
@@ -418,8 +414,8 @@ exec(command,(error, stdout, stderr) => {
                             context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
                         }           
                         
-                        $("#shot-ranking ul").html(shotRankingHtml);
-                        
+                        shotRanking.innerHTML = "<ul>" + shotRankingHtml + "</ul>";
+                                                
                     }
                             
                     //draw theoritical lines
@@ -514,9 +510,8 @@ exec(command,(error, stdout, stderr) => {
                     
                     }
         
-            readScreen(delay);
+                    setTimeout(readScreen,0);
         
-            }, delay);
       }
       
       readScreen(1);

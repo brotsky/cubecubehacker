@@ -87,9 +87,10 @@ let gridColors = [
 
 
 function refresh() {
-  $('select').imagepicker({
+ /* $('select').imagepicker({
     hide_select : true
   });
+  */
 }
 
 function addSource(source) {
@@ -910,14 +911,14 @@ function gridToPrint(grid) {
     console.log(str);
 }
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function(event) { 
   showSources();
   refresh();
   
   shoot();
   setInterval(shoot, 100);
-  
 });
+
 
 $(window).load(function(){    
     setTimeout(function(){
