@@ -125,7 +125,7 @@ function toggle() {
   if (!desktopSharing) {
       
       
-      console.log($('select').val());
+  //    console.log($('select').val());
       
       var id = false;
       
@@ -159,7 +159,7 @@ function onAccessApproved(desktop_id) {
   }
   desktopSharing = true;
   document.getElementById('enable-capture').innerHTML = "Disable Capture";
-  console.log("Desktop sharing started.. desktop_id:" + desktop_id);
+//  console.log("Desktop sharing started.. desktop_id:" + desktop_id);
   navigator.webkitGetUserMedia({
     audio: false,
     video: {
@@ -175,6 +175,7 @@ function onAccessApproved(desktop_id) {
   }, gotStream, getUserMediaError);
 
   function gotStream(stream) {
+            
     localStream = stream;
     document.querySelector('video').src = URL.createObjectURL(stream);
   /*  stream.onended = function() {
@@ -702,7 +703,7 @@ function showGrid() {
                                     };
                                 }
                                 
-                                console.log(n + ") match at " + i + ", " + j);
+                             //   console.log(n + ") match at " + i + ", " + j);
                             }
                         }
                     }
@@ -760,15 +761,15 @@ function showGrid() {
             
             for(var s = 0 ; s < order.length ; s++) {
                 
-                console.log(order[s]);
+            //    console.log(order[s]);
                 
                 var shape = shapes[order[s]];
-                console.log(shape);
+           //     console.log(shape);
                 var shapeAvailableSpaces = shape.availableSpaces;
                 
                 for(var a = 0 ; a < shapeAvailableSpaces.length ; a++) {
                     var space = shapeAvailableSpaces[a];
-                    console.log(space);
+              //      console.log(space);
                     
                     
                        //find op moves here 
@@ -779,7 +780,7 @@ function showGrid() {
                     
                     for(var i = 0 ; i < 10 ; i++) {
                         if(sumOfRow(tempGrid,i) == 10) {
-                            console.log("remove row " + i);
+                    //        console.log("remove row " + i);
                             
                             matchCount++;
                             
@@ -788,7 +789,7 @@ function showGrid() {
                         }
                         
                         if(sumOfCol(tempGrid,i) == 10) {
-                            console.log("remove col " + i);
+                      //      console.log("remove col " + i);
                             
                             matchCount++;
                             
@@ -800,16 +801,16 @@ function showGrid() {
                     
                     
                 }
-                console.log(shape);
+          //      console.log(shape);
             }
             
             gridToPrint(tempGrid);
-            console.log("Match Count",matchCount);
+  //          console.log("Match Count",matchCount);
             
         }
         
         
-        console.log(shapes);
+//        console.log(shapes);
     
     }
     

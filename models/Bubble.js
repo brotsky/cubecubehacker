@@ -279,3 +279,5 @@ function Bubble(x,y,color,iData) {
     
     return;
 }
+
+module.exports = new Bubble();

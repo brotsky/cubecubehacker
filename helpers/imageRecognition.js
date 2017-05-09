@@ -28,6 +28,7 @@ var getBubbleColor = function(iData) {
     var red = [203,44,34];
     var red2 = [186,52,33];
     var lightpurple = [204,203,250];
+    var darkpurple = [74,73,115];
     
                 
     if(colorArrayMatches(iData.data,purple))
@@ -66,6 +67,36 @@ var getBubbleColor = function(iData) {
         return "red";
     else if(colorArrayMatches(iData.data,lightpurple))
         return "lightpurple";
+    else if(colorArrayMatches(iData.data,darkpurple))
+        return "darkpurple";
     else
         return false;
+}
+
+function isPlayingShooter(videoContext) {
+    var isPlaying = true;
+    
+    //make sure the bottom corner is light purple
+    var checkIfOnGameColor = videoContext.getImageData(iPhoneScreenWidth - 10, iPhoneScreenHeight - 10, 1, 1);
+    if(getBubbleColor(checkIfOnGameColor) !== "lightpurple") {
+        isPlaying = false;
+    }
+    
+    //make sure the space next to on deck bubble is light purple
+    var checkIfOnGameColor = videoContext.getImageData(rotationPointX + gridSpacing, rotationPointY + onDeckOffset, 1, 1);
+    if(getBubbleColor(checkIfOnGameColor) !== "lightpurple") {
+        isPlaying = false;
+    }
+    
+    var checkIfOnGameColor = videoContext.getImageData(rotationPointX, iPhoneScreenHeight * .59, 1, 1);
+        
+    //if there is dark purple in the middle of screen the game is over
+    if(getBubbleColor(checkIfOnGameColor) === "darkpurple") {
+        isPlaying = false;
+    }
+    
+  //  console.log("isPlaying",isPlaying);
+    
+    return isPlaying;
+        
 }
