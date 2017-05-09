@@ -63,7 +63,11 @@ var bubbleIntersectionRadius = 1.3;
 
 var onDeckOffset = 74;
 
+var bubbleColors = ["purple","green","orange","lightblue","blue","red"];
+
 var debug = false;
+
+var displayBubbleColor = 'transparent';
 /*
 
 setTimeout(function(){
@@ -247,6 +251,15 @@ exec(command,(error, stdout, stderr) => {
   <script>
       
     var grid = new Grid;
+    
+    var w = iPhoneScreenWidth;
+                    var h = iPhoneScreenHeight;
+                    var videoCanvas = document.createElement('canvas');
+                        videoCanvas.width  = w;
+                        videoCanvas.height = h;
+          
+          var videoContext = videoCanvas.getContext('2d');
+    
           
     window.onload = function() {
                         
@@ -265,347 +278,241 @@ exec(command,(error, stdout, stderr) => {
       context.fillStyle = "#fff";
       context.font = '11px Helvetica';
       
-      /*
-      tracking.ColorTracker.registerColor('darkgrey1', function(r, g, b) {
-        var dx = r - 55;
-        var dy = g - 46;
-        var dz = b - 56;
-        if ((b - g) >= 100 && (r - g) >= 60) {
-          return true;
-        }
-        return dx * dx + dy * dy + dz * dz < 3500;
-      });
       
-      tracking.ColorTracker.registerColor('darkgrey2', function(r, g, b) {
-        var dx = r - 50;
-        var dy = g - 44;
-        var dz = b - 61;
-        if ((b - g) >= 100 && (r - g) >= 60) {
-          return true;
-        }
-        return dx * dx + dy * dy + dz * dz < 3500;
-      });
       
-      tracking.ColorTracker.registerColor('greenbubble', function(r, g, b) {
-        var dx = r - 38;
-        var dy = g - 173;
-        var dz = b - 0;
-        if ((b - g) >= 100 && (r - g) >= 60) {
-          return true;
-        }
-        return dx * dx + dy * dy + dz * dz < 3500;
-      });
-            
-      var tracker = new tracking.ColorTracker(['darkgrey1','darkgrey2','greenbubble']);
-      tracker.setMinDimension((5 / 416) * iPhoneScreenWidth);
-      tracker.setMaxDimension((30 / 416) * iPhoneScreenWidth);
-      tracking.track('#iphone-screen-stream', tracker);
       
-      */
       var readScreen = function(delay) {
             setTimeout(function(){
-           var w = iPhoneScreenWidth;
-                    var h = iPhoneScreenHeight;
-                    var videoCanvas = document.createElement('canvas');
-                        videoCanvas.width  = w;
-                        videoCanvas.height = h;
-          
-          var videoContext = videoCanvas.getContext('2d');
+           
                     videoContext.drawImage(video, 0, 0, w, h);
         
         
-        var timerContext = videoCanvas.getContext('2d');
-            timerContext.drawImage(video,200,400,50,50);
-        
-        
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        
-                
-        
-        if(!isPlayingShooter(videoContext)) {
-            readScreen(delay);
-            return;
-        }
-        
-
-        
-        
-        iData = videoContext.getImageData(rotationPointX + onDeckOffset * .2, rotationPointY, 1, 1);
-        
-        
-        
-        var onDeckData = videoContext.getImageData(rotationPointX, rotationPointY + onDeckOffset, 1, 1);
-        
-        shooterBallColor = getBubbleColor(iData);
-        onDeckBallColor = getBubbleColor(onDeckData);
-        
-        
-        
-        
-        var centerX = rotationPointX;
-        var centerY = rotationPointY;
-        
-        var radius = gridSpacing / 2;
-        
-        context.beginPath();
-        context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-     //   context.fillStyle = 'red';
-       // context.fill();
-        context.lineWidth = 1;
-        context.strokeStyle = '#003300';
-        context.stroke();
-        
-        if(shooterBallColor === "purple") {
-            context.fillStyle = 'purple';
-            context.fill();
-        } else if(shooterBallColor === "green") {
-            context.fillStyle = 'green';
-            context.fill();
-        } else if(shooterBallColor === "orange") {
-            context.fillStyle = 'orange';
-            context.fill();
-        } else if(shooterBallColor === "lightblue") {
-            context.fillStyle = '#34a5f2';
-            context.fill();
-        } else if(shooterBallColor === "blue") {
-            context.fillStyle = 'blue';
-            context.fill();
-        } else if(shooterBallColor === "red") {
-            context.fillStyle = 'red';
-            context.fill();
-        } else {
-            context.fillStyle = 'transparent';
-        }
-        
-        context.beginPath();
-        context.arc(centerX, centerY + onDeckOffset, radius, 0, 2 * Math.PI, false);
-     //   context.fillStyle = 'red';
-       // context.fill();
-        context.lineWidth = 1;
-        context.strokeStyle = '#003300';
-        context.stroke();
-        
-        if(onDeckBallColor === "purple") {
-            context.fillStyle = 'purple';
-            context.fill();
-        } else if(onDeckBallColor === "green") {
-            context.fillStyle = 'green';
-            context.fill();
-        } else if(onDeckBallColor === "orange") {
-            context.fillStyle = 'orange';
-            context.fill();
-        } else if(onDeckBallColor === "lightblue") {
-            context.fillStyle = '#34a5f2';
-            context.fill();
-        } else if(onDeckBallColor === "blue") {
-            context.fillStyle = 'blue';
-            context.fill();
-        } else if(onDeckBallColor === "red") {
-            context.fillStyle = 'red';
-            context.fill();
-        } else {
-            context.fillStyle = 'transparent';
-        }
+                    var timerContext = videoCanvas.getContext('2d');
+                        timerContext.drawImage(video,200,400,50,50);
+                    
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                            
+                    if(!isPlayingShooter(videoContext)) {
+                        readScreen(delay);
+                        return;
+                    }
             
-        if(getBubbleColor(iData)) {
-            grid.resetGrid();
-            for(var j = 0 ; j < 15 ; j++) {
-                if(grid.lastRow() == j - 1) //only check until rows are empty
-                for(var i = 0 ; i < 11 ; i++) {
+                    iData = videoContext.getImageData(rotationPointX + onDeckOffset * .2, rotationPointY, 1, 1);
+                            
+                    var onDeckData = videoContext.getImageData(rotationPointX, rotationPointY + onDeckOffset, 1, 1);
                     
-                    var centerX = 68 + i * gridSpacing;
-                    var centerY = 204 + j * gridSpacing;
+                    shooterBallColor = getBubbleColor(iData);
+                    onDeckBallColor = getBubbleColor(onDeckData);
                     
-                    if(j % 2 === 1)
-                        centerX += gridSpacing / 2;
+                    var centerX = rotationPointX;
+                    var centerY = rotationPointY;
                     
                     var radius = gridSpacing / 2;
                     
                     context.beginPath();
                     context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-                 //   context.fillStyle = 'red';
-                   // context.fill();
                     context.lineWidth = 1;
                     context.strokeStyle = '#003300';
                     context.stroke();
                     
-                 //   if(i == 2 && j == 0) {
+                    displayBubbleColor = 'transparent';
+                                                            
+                    if(bubbleColors.indexOf(shooterBallColor) > -1)
+                        displayBubbleColor = shooterBallColor;
+                                            
+                    context.fillStyle = displayBubbleColor;
+                    if(shooterBallColor === "lightblue")
+                        context.fillStyle = "#34a5f2";
                     
+                    context.fill();
+                    
+                    context.beginPath();
+                    context.arc(centerX, centerY + onDeckOffset, radius, 0, 2 * Math.PI, false);
+                    context.lineWidth = 1;
+                    context.strokeStyle = '#003300';
+                    context.stroke();
+                            
+                    displayBubbleColor = 'transparent';
+                                                            
+                    if(bubbleColors.indexOf(onDeckBallColor) > -1)
+                        displayBubbleColor = onDeckBallColor;
+                                            
+                    context.fillStyle = displayBubbleColor;
+                    if(onDeckBallColor === "lightblue")
+                        context.fillStyle = "#34a5f2";
+                    
+                    context.fill();        
                         
-                        
-                        
-                        iData = videoContext.getImageData(centerX, centerY, 1, 1);
-                        
-                        var bubbleColor = getBubbleColor(iData);
-                        
-                        if(bubbleColor === "purple") {
-                            context.fillStyle = 'purple';
-                            context.fill();
-                            grid.add(i,j,'purple',iData);
-                        } else if(bubbleColor === "green") {
-                            context.fillStyle = 'green';
-                            context.fill();
-                            grid.add(i,j,'green',iData);
-                        } else if(bubbleColor === "orange") {
-                            context.fillStyle = 'orange';
-                            context.fill();
-                            grid.add(i,j,'orange',iData);
-                        } else if(bubbleColor === "lightblue") {
-                            context.fillStyle = '#34a5f2';
-                            context.fill();
-                            grid.add(i,j,'lightblue',iData);
-                        } else if(bubbleColor === "blue") {
-                            context.fillStyle = 'blue';
-                            context.fill();
-                            grid.add(i,j,'blue',iData);
-                        } else if(bubbleColor === "red") {
-                            context.fillStyle = 'red';
-                            context.fill();
-                            grid.add(i,j,'red',iData);
-                        } else {
-                            context.fillStyle = 'transparent';
-                            grid.add(i,j,0,iData);
+                    if(getBubbleColor(iData)) {
+                        grid.resetGrid();
+                        for(var j = 0 ; j < 15 ; j++) {
+                            if(grid.lastRow() == j - 1) //only check until rows are empty
+                            for(var i = 0 ; i < 11 ; i++) {
+                                
+                                var centerX = 68 + i * gridSpacing;
+                                var centerY = 204 + j * gridSpacing;
+                                
+                                if(j % 2 === 1)
+                                    centerX += gridSpacing / 2;
+                                
+                                var radius = gridSpacing / 2;
+                                
+                                context.beginPath();
+                                context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+                                context.lineWidth = 1;
+                                context.strokeStyle = '#003300';
+                                context.stroke();
+                                                                            
+                                    iData = videoContext.getImageData(Math.round( centerX ),  Math.round( centerY ), 1, 1);
+                                    
+                                    //fix bug that only happens on that single bubble                        
+                                    if(j == 5 && i == 3)
+                                        iData = videoContext.getImageData(Math.round( centerX),  Math.round( centerY  + .3 * gridSpacing), 1, 1);
+                                    
+                                    var bubbleColor = getBubbleColor(iData);
+                                    
+                                    displayBubbleColor = 'transparent';
+                                                            
+                                    if(bubbleColors.indexOf(bubbleColor) > -1)
+                                        displayBubbleColor = bubbleColor;
+                                                            
+                                    context.fillStyle = displayBubbleColor;
+                                    if(bubbleColor === "lightblue")
+                                        context.fillStyle = "#34a5f2";
+                                    
+                                    context.fill();
+                                    
+                                    grid.add(i,j,displayBubbleColor,iData);                    
+                            }
+                            
                         }
                         
-                   //     var possibleShots = grid.getPossibleShots('r');
-                      //  if()
+                        grid.validateGrid();
+                        
+                        //create bubbles after validation
+                        
+                        $("#shot-ranking ul").empty();
+                        
+                        var shotRankingHtml = "";
+                        
+                        var availableShots = grid.availableShots();
+                        
+                        var intersectionCounter = 1;
+                        for(var i = 0 ; i < availableShots.length ; i++) {
                                             
-              //      tracker.stop();
+                            var shot = availableShots[i];
+                            
+                            shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + " pts</li>";
+                            
+                            context.beginPath();
+                            context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
+                            context.fillStyle = 'rgba(0,0,0,.5)';
+                            
+                            context.fill();
+                            context.lineWidth = 1;
+                            context.strokeStyle = '#003300';
+                            context.stroke();
+                            
+                            context.fillStyle = "white";
+                            context.textAlign = "center";
+                            context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
+                        }           
+                        
+                        $("#shot-ranking ul").html(shotRankingHtml);
+                        
+                    }
+                            
+                    //draw theoritical lines
                     
-                //    }
+                    if(showLines) {
+                                    
+                        context.strokeStyle = "#ff0096";
+                        
+                        var lineCounter = 0;
+                        for(var i = 100 ; i < rotationPointY ; i+=20) {
+                            
+                            context.beginPath();
+                            context.moveTo(leftWall, i);
+                            context.lineTo(rotationPointX,rotationPointY);
+                            context.closePath();
+                            context.stroke();
+                            lineCounter++;
+                            
+                            context.beginPath();
+                            context.moveTo(rightWall, i);
+                            context.lineTo(rotationPointX,rotationPointY);
+                            context.closePath();
+                            context.stroke();
+                            
+                            lineCounter++;
+                        
+                        }
+                        
+                        for(var i = 35 ; i <= iPhoneScreenWidth - 35 ; i+=10) {
+                            
+                            context.beginPath();
+                            context.moveTo(i, 100);
+                            context.lineTo(rotationPointX,rotationPointY);
+                            context.closePath();
+                            context.stroke();
+                            lineCounter++;
+                        
+                        }
+                                    
+                        context.strokeStyle = "#000";
+                    }
                     
-                }
-                
-            }
-            
-            grid.validateGrid();
-            
-            //create bubbles after validation
-            
-            $("#shot-ranking ul").empty();
-            
-            var shotRankingHtml = "";
-            
-            var availableShots = grid.availableShots();
-            
-            var intersectionCounter = 1;
-            for(var i = 0 ; i < availableShots.length ; i++) {
+                    var bestShot = grid.bestShot();                    
+                    
+                    if(bestShot) {
+                        if(typeof bestShot.touchPoints != "undefined" && bestShot.touchPoints.length > 0) {
+                            
+                            context.strokeStyle = "#ff0096";
+                            for(var i = 0 ; i < bestShot.touchPoints.length ; i++) {
+                                context.beginPath();
+                                context.moveTo(bestShot.touchPoints[i].touchPoint.x, bestShot.touchPoints[i].touchPoint.y);
+                                context.lineTo(rotationPointX,rotationPointY);
+                                context.closePath();
+                                context.stroke();
+                            }
+                            
+                            
+                            context.strokeStyle = "#000";
+                        }
+                    
+                    
+                        var bestTouchPoint = bestShot.bestTouchPoint();
+                        
+                        if(!shooterBallColor) {
+                            bestTouchPoint = false;
+                            bestTouchPointTemp = bestTouchPoint;
+                        }
+                        
+                        if(bestTouchPoint) {
+                            if(bestTouchPointTemp == null)
+                                bestTouchPointTemp = bestTouchPoint;
+                            
+                            if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
+                                bestTouchPointTemp = bestTouchPoint;
                                 
-                var shot = availableShots[i];
-                
-                shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + " pts</li>";
-                
-                context.beginPath();
-                context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
-                context.fillStyle = 'rgba(0,0,0,.5)';
-                
-                context.fill();
-                context.lineWidth = 1;
-                context.strokeStyle = '#003300';
-                context.stroke();
-                
-                context.fillStyle = "white";
-                context.textAlign = "center";
-                context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
-            }           
+                                bestTouchPoint.moveRobot();                    
+                            }
             
-            $("#shot-ranking ul").html(shotRankingHtml);
-            
-        }
-                
-        //draw theoritical lines
-        
-        if(showLines) {
-                        
-            context.strokeStyle = "#ff0096";
-            
-            var lineCounter = 0;
-            for(var i = 100 ; i < rotationPointY ; i+=20) {
-                
-                context.beginPath();
-                context.moveTo(leftWall, i);
-                context.lineTo(rotationPointX,rotationPointY);
-                context.closePath();
-                context.stroke();
-                lineCounter++;
-                
-                context.beginPath();
-                context.moveTo(rightWall, i);
-                context.lineTo(rotationPointX,rotationPointY);
-                context.closePath();
-                context.stroke();
-                
-                lineCounter++;
-            
-            }
-            
-            for(var i = 35 ; i <= iPhoneScreenWidth - 35 ; i+=10) {
-                
-                context.beginPath();
-                context.moveTo(i, 100);
-                context.lineTo(rotationPointX,rotationPointY);
-                context.closePath();
-                context.stroke();
-                lineCounter++;
-            
-            }
-                        
-            context.strokeStyle = "#000";
-        }
-        
-        
-        var bestShot = grid.bestShot();
-        
-        
-        if(bestShot) {
-            if(typeof bestShot.touchPoints != "undefined" && bestShot.touchPoints.length > 0) {
-                
-                context.strokeStyle = "#ff0096";
-                for(var i = 0 ; i < bestShot.touchPoints.length ; i++) {
-                    context.beginPath();
-                    context.moveTo(bestShot.touchPoints[i].touchPoint.x, bestShot.touchPoints[i].touchPoint.y);
-                    context.lineTo(rotationPointX,rotationPointY);
-                    context.closePath();
-                    context.stroke();
-                }
-                
-                
-                context.strokeStyle = "#000";
-            }
-        
-        
-            var bestTouchPoint = bestShot.bestTouchPoint();
-            
-            if(!shooterBallColor) {
-                bestTouchPoint = false;
-                bestTouchPointTemp = bestTouchPoint;
-            }
-            
-            if(bestTouchPoint) {
-                if(bestTouchPointTemp == null)
-                    bestTouchPointTemp = bestTouchPoint;
-                
-                if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
-                    bestTouchPointTemp = bestTouchPoint;
+                            if(typeof bestTouchPoint != "undefined") {
+                                
+                                context.strokeStyle = "#000";
+                                
+                                context.beginPath();
+                                context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
+                                context.lineTo(rotationPointX,rotationPointY);
+                                context.closePath();
+                                context.stroke();
+                            
+                                context.strokeStyle = "#000";
+                            }
+                        }
                     
-                    bestTouchPoint.moveRobot();                    
-                }
-
-                if(typeof bestTouchPoint != "undefined") {
-                    
-                    context.strokeStyle = "#000";
-                    
-                    context.beginPath();
-                    context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
-                    context.lineTo(rotationPointX,rotationPointY);
-                    context.closePath();
-                    context.stroke();
-                
-                    context.strokeStyle = "#000";
-                }
-            }
-        
-        }
+                    }
         
             readScreen(delay);
         
@@ -613,10 +520,7 @@ exec(command,(error, stdout, stderr) => {
       }
       
       readScreen(1);
-      
-  //    tracker.on('track', readScreen );
-      
-      
+            
       function stylusPos(event) {
             
             var canvas = document.getElementById("canvas");
@@ -627,9 +531,13 @@ exec(command,(error, stdout, stderr) => {
             console.log("canvasX: " + x +
             " - canvasY: " + y);
             
+            console.log(getBubbleColor(videoContext.getImageData(x,y, 1, 1)));
             
             var robot_x = widthRatio * x;
             var robot_y = heightRatio * y;
+            
+            
+            return;
             
             
          //   var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
@@ -682,7 +590,7 @@ exec(command,(error, stdout, stderr) => {
                 });            
         }
         
-    //    document.getElementById("canvas").addEventListener("mousemove", stylusPos);
+       document.getElementById("canvas").addEventListener("mousemove", stylusPos);
       
     //    document.getElementById("canvas").addEventListener("mousedown",stylusDown);
       //  document.getElementById("canvas").addEventListener("mouseup",stylusUp);

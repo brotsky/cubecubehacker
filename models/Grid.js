@@ -13,6 +13,13 @@ function Grid() {
     
     this.add = function(x,y,contents,iData) {
         
+                
+        if(!contents || contents == "transparent")
+            contents = 0;
+        
+        if(contents === "#34a5f2")
+            contents = "lightblue";
+            
         var bubble = new Bubble(x, y, contents, iData);
         
     //    if(bubble.adjacentMatches(0).length < 6) //don't add falling pieces
