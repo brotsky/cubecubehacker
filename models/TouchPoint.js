@@ -11,7 +11,7 @@ function TouchPoint(x,y) {
         var command = "/usr/local/bin/axi down; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi up;";
         
         console.log(command);
-        
+      //  return;
         if(!debug)
             exec(command,(error, stdout, stderr) => {
                   if (error) {

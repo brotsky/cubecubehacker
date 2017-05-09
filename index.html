@@ -59,7 +59,7 @@ var shooterBallColor, onDeckBallColor;
 
 var bestTouchPointTemp = null;
 
-var bubbleIntersectionRadius = 1.5;
+var bubbleIntersectionRadius = 1.3;
 
 var debug = false;
 setTimeout(function(){
@@ -317,6 +317,16 @@ exec(command,(error, stdout, stderr) => {
         
         var onDeckOffset = 74;
         
+        
+        var checkIfOnGameColor = videoContext.getImageData(iPhoneScreenWidth - 10, iPhoneScreenHeight - 10, 1, 1);
+        
+        if(getBubbleColor(checkIfOnGameColor) !== "lightpurple") {
+            return;
+        }
+        
+        
+        console.log("checkIfOnGameColor",checkIfOnGameColor);
+        
         iData = videoContext.getImageData(rotationPointX + onDeckOffset * .2, rotationPointY, 1, 1);
         
         
@@ -428,30 +438,30 @@ exec(command,(error, stdout, stderr) => {
                         if(bubbleColor === "purple") {
                             context.fillStyle = 'purple';
                             context.fill();
-                            grid.add(i,j,'purple');
+                            grid.add(i,j,'purple',iData);
                         } else if(bubbleColor === "green") {
                             context.fillStyle = 'green';
                             context.fill();
-                            grid.add(i,j,'green');
+                            grid.add(i,j,'green',iData);
                         } else if(bubbleColor === "orange") {
                             context.fillStyle = 'orange';
                             context.fill();
-                            grid.add(i,j,'orange');
+                            grid.add(i,j,'orange',iData);
                         } else if(bubbleColor === "lightblue") {
                             context.fillStyle = '#34a5f2';
                             context.fill();
-                            grid.add(i,j,'lightblue');
+                            grid.add(i,j,'lightblue',iData);
                         } else if(bubbleColor === "blue") {
                             context.fillStyle = 'blue';
                             context.fill();
-                            grid.add(i,j,'blue');
+                            grid.add(i,j,'blue',iData);
                         } else if(bubbleColor === "red") {
                             context.fillStyle = 'red';
                             context.fill();
-                            grid.add(i,j,'red');
+                            grid.add(i,j,'red',iData);
                         } else {
                             context.fillStyle = 'transparent';
-                            grid.add(i,j,0);
+                            grid.add(i,j,0,iData);
                         }
                         
                    //     var possibleShots = grid.getPossibleShots('r');
@@ -771,7 +781,7 @@ exec(command,(error, stdout, stderr) => {
       });
       
       
-      function printMousePos(event) {
+      function stylusPos(event) {
             
             var canvas = document.getElementById("canvas");
             
@@ -786,10 +796,12 @@ exec(command,(error, stdout, stderr) => {
             var robot_y = heightRatio * y;
             
             
-            var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
+         //   var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
+            
+            var command = " /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; ";
             
             console.log(command);
-            
+         //   return;
             exec(command,(error, stdout, stderr) => {
                   if (error) {
                     console.error(`exec error: ${error}`);
@@ -797,13 +809,47 @@ exec(command,(error, stdout, stderr) => {
                   }
                   console.log(`stdout: ${stdout}`);
                   console.log(`stderr: ${stderr}`);
-                });
-            
-            
-            
+                });            
         }
         
-        document.getElementById("canvas").addEventListener("click", printMousePos);
+        function stylusDown(event) {
+                                
+            
+            var command = "/usr/local/bin/axi down;";
+            
+            console.log(command);
+         //   return;
+            exec(command,(error, stdout, stderr) => {
+                  if (error) {
+                    console.error(`exec error: ${error}`);
+                    return;
+                  }
+                  console.log(`stdout: ${stdout}`);
+                  console.log(`stderr: ${stderr}`);
+                });            
+        }
+        
+        function stylusUp(event) {
+                                
+            
+            var command = "/usr/local/bin/axi up;";
+            
+            console.log(command);
+         //   return;
+            exec(command,(error, stdout, stderr) => {
+                  if (error) {
+                    console.error(`exec error: ${error}`);
+                    return;
+                  }
+                  console.log(`stdout: ${stdout}`);
+                  console.log(`stderr: ${stderr}`);
+                });            
+        }
+        
+        document.getElementById("canvas").addEventListener("mousemove", stylusPos);
+        
+        document.getElementById("canvas").addEventListener("mousedown",stylusDown);
+        document.getElementById("canvas").addEventListener("mouseup",stylusUp);
       
       
     };

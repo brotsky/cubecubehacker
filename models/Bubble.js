@@ -1,7 +1,10 @@
-function Bubble(x,y,color) {
+function Bubble(x,y,color,iData) {
     
     this.x = x;
     this.y = y;
+    
+    this.imageData = iData;
+    
     this.points = function() {
         
         var points = 0;

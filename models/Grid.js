@@ -11,9 +11,9 @@ function Grid() {
         }
     }
     
-    this.add = function(x,y,contents) {
+    this.add = function(x,y,contents,iData) {
         
-        var bubble = new Bubble(x, y, contents);
+        var bubble = new Bubble(x, y, contents, iData);
         
     //    if(bubble.adjacentMatches(0).length < 6) //don't add falling pieces
             this.grid[x][y] = bubble;
