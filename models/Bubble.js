@@ -5,14 +5,16 @@ function Bubble(x,y,color,iData) {
     
     this.imageData = iData;
     
-    this.points = function() {
+    this.removed = false;
+    
+    this.points = function(withColor = shooterBallColor) {
         
         var points = 0;
         
         if(this.color !== 0)
             return points;
         
-        var cluster = this.getCluster(shooterBallColor);
+        var cluster = this.getCluster(withColor);
                 
         for(var i = 0 ; i < cluster.size ; i++) {
             if(i < 3)
@@ -97,7 +99,7 @@ function Bubble(x,y,color,iData) {
         var count = 0;
         
         for(var i = 0 ; i < spaces.length ; i++) {
-            if(spaces[i].color !== 0)
+            if(spaces[i].color !== 0 && spaces[i].removed === false)
                 count++;
         }
         

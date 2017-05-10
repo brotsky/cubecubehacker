@@ -1,7 +1,9 @@
 function Grid() {
     
     this.grid = [];
-            
+    
+    this.bubblesAlreadyRemoved = [];
+    
     this.resetGrid = function() {
         for(var i = 0 ; i < 11 ; i++) {
             this.grid[i] = [];
@@ -9,6 +11,19 @@ function Grid() {
                 this.grid[i][j] = new Bubble(i,j,0);
             }
         }
+    }
+    
+    
+    this.bubbleWasRemoved = function(bubble) {
+        
+        for(var i = 0 ; i < this.bubblesAlreadyRemoved.length ; i++) {
+            
+            var gridBubble = this.bubblesAlreadyRemoved[i];
+            
+            if(bubble.x === gridBubble.x && bubble.y === gridBubble.y && bubble.color === gridBubble.color)
+                return true;
+        }
+        return false;
     }
     
     this.add = function(x,y,contents,iData) {
@@ -19,11 +34,18 @@ function Grid() {
         
         if(contents === "#34a5f2")
             contents = "lightblue";
-            
-        var bubble = new Bubble(x, y, contents, iData);
+        
+        
+        var bubble = new Bubble(x, y, contents, iData );
+        
+        bubble.removed = this.bubbleWasRemoved(bubble);
         
     //    if(bubble.adjacentMatches(0).length < 6) //don't add falling pieces
-            this.grid[x][y] = bubble;
+        
+        this.grid[x][y] = bubble;
+        
+        
+        return !bubble.removed;
     }
     
     this.validateGrid = function() {
@@ -94,7 +116,7 @@ function Grid() {
         for(var i = 0 ; i < 11 ; i++) {
             for(var j = 0 ; j < 15 ; j++) {
                 if(typeof this.grid[i] != "undefined" && typeof this.grid[i][j] != "undefined")
-                array.push(this.grid[i][j]);
+                    array.push(this.grid[i][j]);
             }
         }
         
@@ -112,7 +134,7 @@ function Grid() {
         var array = [];
         for(var i = 0 ; i < 11 ; i++) {
             for(var j = 0 ; j < 15 ; j++) {
-                if(typeof this.grid[i][j] != "undefined" && this.grid[i][j].color !== 0)
+                if(typeof this.grid[i] != "undefined" && typeof this.grid[i][j] != "undefined" && this.grid[i][j].color !== 0)
                 array.push(this.grid[i][j]);
             }
         }
@@ -157,7 +179,10 @@ function Grid() {
                             
             for(var s = 0 ; s < sortedBubbles.length ; s++ ) {
                 
+                
+                
                 var shot = sortedBubbles[s];
+                
                 
                 var centerX = 68 + shot.x * gridSpacing;
                 var centerY = 204 + shot.y * gridSpacing;
@@ -192,13 +217,13 @@ function Grid() {
                 }
                 
                 if(intersections.length !== 0) {
-                    if(shot.color !== 0 || shot.y === 0) {
+                    if(shot.color !== 0 || shot.y === 0 || shot.removed === true) {
                         
                         var shotToRecord = lastEmptyBubble;
                         if(shot.y === 0)
                             shotToRecord = shot;
                         
-                        if(shotToRecord.color === 0 && (shotToRecord.countFilledNeighbors() > 0 || shotToRecord.y === 0)) {
+                        if((shotToRecord.color === 0 || shotToRecord.removed === true) && (shotToRecord.countFilledNeighbors() > 0 || shotToRecord.y === 0)) {
                             shotToRecord.addTouchPoint(touchPoint,hasBounce);
                             if(!this.alreadyInCollection(shotToRecord,array))
                                 array.push(shotToRecord);
@@ -208,15 +233,22 @@ function Grid() {
                         lastEmptyBubble = shot;
                     }
                 }
+                
             }
         }
-                
+                                
         //validate the available shots
         return this.checkAvailableShots(array);
         
     }
     
     this.bestShot = function() {
+        
+        var withColor = shooterBallColor;
+        
+        if(!withColor)
+            withColor = onDeckBallColor
+        
         var shots = this.availableShots();
         
         var mostPoints = 0;
@@ -224,7 +256,7 @@ function Grid() {
         
         for(var i = 0 ; i < shots.length ; i++) {
             
-            var points = shots[i].points();
+            var points = shots[i].points(withColor);
             
             if(points > mostPoints) {
                 mostPoints = points;

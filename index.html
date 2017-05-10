@@ -11,6 +11,7 @@
     
     var Tesseract = require('tesseract.js');
     var Robot = require('./models/Robot.js');
+    var GameEvents = require('./models/GameEvents.js');
     
     const exec = require('child_process').exec;
 
@@ -67,6 +68,7 @@ var bubbleColors = ["purple","green","orange","lightblue","blue","red"];
 var debug = false;
 
 var displayBubbleColor = 'transparent';
+
 /*
 
 setTimeout(function(){
@@ -278,28 +280,84 @@ exec(command,(error, stdout, stderr) => {
       context.font = '11px Helvetica';
             
       var readScreen = function(delay) {
-           
-                    videoContext.drawImage(video, 0, 0, w, h);
+
+        videoContext.drawImage(video, 0, 0, w, h);
+
+        var timerContext = videoCanvas.getContext('2d');
+            timerContext.drawImage(video,200,400,50,50);
         
-                    var timerContext = videoCanvas.getContext('2d');
-                        timerContext.drawImage(video,200,400,50,50);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+                
+        if(!isPlayingShooter(videoContext)) {
+            setTimeout(readScreen,delay);
+            return;
+        }
+
+        iData = videoContext.getImageData(rotationPointX + onDeckOffset * .2, rotationPointY, 1, 1);
+                
+        var onDeckData = videoContext.getImageData(rotationPointX, rotationPointY + onDeckOffset, 1, 1);
+        
+        shooterBallColor = getBubbleColor(iData);
+        
+        if(shooterBallColor === "lightpurple")
+            shooterBallColor = false;
                     
-                    context.clearRect(0, 0, canvas.width, canvas.height);
-                            
-                    if(!isPlayingShooter(videoContext)) {
-                        setTimeout(readScreen,delay);
-                        return;
-                    }
+        onDeckBallColor = getBubbleColor(onDeckData);
+        
+        if(onDeckBallColor === "lightpurple")
+            onDeckBallColor = false;
+        
+        
+        var centerX = rotationPointX;
+        var centerY = rotationPointY;
+        
+        var radius = gridSpacing / 2;
+        
+        context.beginPath();
+        context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        context.lineWidth = 1;
+        context.strokeStyle = '#003300';
+        context.stroke();
+        
+        displayBubbleColor = 'transparent';
+                                                
+        if(bubbleColors.indexOf(shooterBallColor) > -1)
+            displayBubbleColor = shooterBallColor;
+                                
+        context.fillStyle = displayBubbleColor;
+        if(shooterBallColor === "lightblue")
+            context.fillStyle = "#34a5f2";
+        
+        context.fill();
+        
+        context.beginPath();
+        context.arc(centerX, centerY + onDeckOffset, radius, 0, 2 * Math.PI, false);
+        context.lineWidth = 1;
+        context.strokeStyle = '#003300';
+        context.stroke();
+                
+        displayBubbleColor = 'transparent';
+                                                
+        if(bubbleColors.indexOf(onDeckBallColor) > -1)
+            displayBubbleColor = onDeckBallColor;
+                                
+        context.fillStyle = displayBubbleColor;
+        if(onDeckBallColor === "lightblue")
+            context.fillStyle = "#34a5f2";
+        
+        context.fill();        
             
-                    iData = videoContext.getImageData(rotationPointX + onDeckOffset * .2, rotationPointY, 1, 1);
-                            
-                    var onDeckData = videoContext.getImageData(rotationPointX, rotationPointY + onDeckOffset, 1, 1);
+        if(getBubbleColor(iData)) {
+            grid.resetGrid();
+            for(var j = 0 ; j < 15 ; j++) {
+                if(grid.lastRow() == j - 1) //only check until rows are empty
+                for(var i = 0 ; i < 11 ; i++) {
                     
-                    shooterBallColor = getBubbleColor(iData);
-                    onDeckBallColor = getBubbleColor(onDeckData);
+                    var centerX = 68 + i * gridSpacing;
+                    var centerY = 204 + j * gridSpacing;
                     
-                    var centerX = rotationPointX;
-                    var centerY = rotationPointY;
+                    if(j % 2 === 1)
+                        centerX += gridSpacing / 2;
                     
                     var radius = gridSpacing / 2;
                     
@@ -308,210 +366,178 @@ exec(command,(error, stdout, stderr) => {
                     context.lineWidth = 1;
                     context.strokeStyle = '#003300';
                     context.stroke();
-                    
-                    displayBubbleColor = 'transparent';
-                                                            
-                    if(bubbleColors.indexOf(shooterBallColor) > -1)
-                        displayBubbleColor = shooterBallColor;
-                                            
-                    context.fillStyle = displayBubbleColor;
-                    if(shooterBallColor === "lightblue")
-                        context.fillStyle = "#34a5f2";
-                    
-                    context.fill();
-                    
-                    context.beginPath();
-                    context.arc(centerX, centerY + onDeckOffset, radius, 0, 2 * Math.PI, false);
-                    context.lineWidth = 1;
-                    context.strokeStyle = '#003300';
-                    context.stroke();
-                            
-                    displayBubbleColor = 'transparent';
-                                                            
-                    if(bubbleColors.indexOf(onDeckBallColor) > -1)
-                        displayBubbleColor = onDeckBallColor;
-                                            
-                    context.fillStyle = displayBubbleColor;
-                    if(onDeckBallColor === "lightblue")
-                        context.fillStyle = "#34a5f2";
-                    
-                    context.fill();        
+                                                                
+                        iData = videoContext.getImageData(Math.round( centerX ),  Math.round( centerY ), 1, 1);
                         
-                    if(getBubbleColor(iData)) {
-                        grid.resetGrid();
-                        for(var j = 0 ; j < 15 ; j++) {
-                            if(grid.lastRow() == j - 1) //only check until rows are empty
-                            for(var i = 0 ; i < 11 ; i++) {
-                                
-                                var centerX = 68 + i * gridSpacing;
-                                var centerY = 204 + j * gridSpacing;
-                                
-                                if(j % 2 === 1)
-                                    centerX += gridSpacing / 2;
-                                
-                                var radius = gridSpacing / 2;
-                                
-                                context.beginPath();
-                                context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-                                context.lineWidth = 1;
-                                context.strokeStyle = '#003300';
-                                context.stroke();
-                                                                            
-                                    iData = videoContext.getImageData(Math.round( centerX ),  Math.round( centerY ), 1, 1);
-                                    
-                                    //fix bug that only happens on that single bubble                        
-                                    if(j == 5 && i == 3)
-                                        iData = videoContext.getImageData(Math.round( centerX),  Math.round( centerY  + .3 * gridSpacing), 1, 1);
-                                    
-                                    var bubbleColor = getBubbleColor(iData);
-                                    
-                                    displayBubbleColor = 'transparent';
-                                                            
-                                    if(bubbleColors.indexOf(bubbleColor) > -1)
-                                        displayBubbleColor = bubbleColor;
-                                                            
-                                    context.fillStyle = displayBubbleColor;
-                                    if(bubbleColor === "lightblue")
-                                        context.fillStyle = "#34a5f2";
-                                    
-                                    context.fill();
-                                    
-                                    grid.add(i,j,displayBubbleColor,iData);                    
-                            }
-                            
-                        }
+                        //fix bug that only happens on that single bubble                        
+                        if(j == 5 && i == 3)
+                            iData = videoContext.getImageData(Math.round( centerX),  Math.round( centerY  + .3 * gridSpacing), 1, 1);
                         
-                        grid.validateGrid();
+                        var bubbleColor = getBubbleColor(iData);
                         
-                        //create bubbles after validation
+                        displayBubbleColor = 'transparent';
                         
-                        var shotRanking = document.getElementById("shot-ranking");
                         
-                        shotRanking.innerHTML = "";
+                        if(bubbleColors.indexOf(bubbleColor) > -1)
+                            displayBubbleColor = bubbleColor;
                                                 
-                        var shotRankingHtml = "";
                         
-                        var availableShots = grid.availableShots();
                         
-                        var intersectionCounter = 1;
-                        for(var i = 0 ; i < availableShots.length ; i++) {
-                                            
-                            var shot = availableShots[i];
-                            
-                            shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + " pts</li>";
-                            
-                            context.beginPath();
-                            context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
-                            context.fillStyle = 'rgba(0,0,0,.5)';
+                        var bubble = grid.add(i,j,displayBubbleColor,iData);    
+                        
+                        if(bubble) {
+                            context.fillStyle = displayBubbleColor;
+                            if(bubbleColor === "lightblue")
+                                context.fillStyle = "#34a5f2";
                             
                             context.fill();
-                            context.lineWidth = 1;
-                            context.strokeStyle = '#003300';
-                            context.stroke();
+                        } else {
+                            context.fillStyle = "#333";
                             
-                            context.fillStyle = "white";
-                            context.textAlign = "center";
-                            context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
-                        }           
-                        
-                        shotRanking.innerHTML = "<ul>" + shotRankingHtml + "</ul>";
-                                                
-                    }
-                            
-                    //draw theoritical lines
-                    
-                    if(showLines) {
-                                    
-                        context.strokeStyle = "#ff0096";
-                        
-                        var lineCounter = 0;
-                        for(var i = 100 ; i < rotationPointY ; i+=20) {
-                            
-                            context.beginPath();
-                            context.moveTo(leftWall, i);
-                            context.lineTo(rotationPointX,rotationPointY);
-                            context.closePath();
-                            context.stroke();
-                            lineCounter++;
-                            
-                            context.beginPath();
-                            context.moveTo(rightWall, i);
-                            context.lineTo(rotationPointX,rotationPointY);
-                            context.closePath();
-                            context.stroke();
-                            
-                            lineCounter++;
-                        
-                        }
-                        
-                        for(var i = 35 ; i <= iPhoneScreenWidth - 35 ; i+=10) {
-                            
-                            context.beginPath();
-                            context.moveTo(i, 100);
-                            context.lineTo(rotationPointX,rotationPointY);
-                            context.closePath();
-                            context.stroke();
-                            lineCounter++;
-                        
-                        }
-                                    
-                        context.strokeStyle = "#000";
-                    }
-                    
-                    var bestShot = grid.bestShot();                    
-                    
-                    if(bestShot) {
-                        if(typeof bestShot.touchPoints != "undefined" && bestShot.touchPoints.length > 0) {
-                            
-                            context.strokeStyle = "#ff0096";
-                            for(var i = 0 ; i < bestShot.touchPoints.length ; i++) {
-                                context.beginPath();
-                                context.moveTo(bestShot.touchPoints[i].touchPoint.x, bestShot.touchPoints[i].touchPoint.y);
-                                context.lineTo(rotationPointX,rotationPointY);
-                                context.closePath();
-                                context.stroke();
-                            }
-                            
-                            
-                            context.strokeStyle = "#000";
-                        }
-                    
-                    
-                        var bestTouchPoint = bestShot.bestTouchPoint();
-                        
-                        if(!shooterBallColor) {
-                            bestTouchPoint = false;
-                            bestTouchPointTemp = bestTouchPoint;
-                        }
-                        
-                        if(bestTouchPoint) {
-                            if(bestTouchPointTemp == null)
-                                bestTouchPointTemp = bestTouchPoint;
-                            
-                            if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
-                                bestTouchPointTemp = bestTouchPoint;
-                                
-                                bestTouchPoint.moveRobot();                    
-                            }
+                            context.fill();
+                        }        
+                }
+                
+            }
             
-                            if(typeof bestTouchPoint != "undefined") {
+            grid.validateGrid();
+            
+            //create bubbles after validation
+            
+            var shotRanking = document.getElementById("shot-ranking");
+            
+            shotRanking.innerHTML = "";
+                                    
+            var shotRankingHtml = "";
+            
+            var availableShots = grid.availableShots();
+            
+            var intersectionCounter = 1;
+            for(var i = 0 ; i < availableShots.length ; i++) {
                                 
-                                context.strokeStyle = "#000";
-                                
-                                context.beginPath();
-                                context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
-                                context.lineTo(rotationPointX,rotationPointY);
-                                context.closePath();
-                                context.stroke();
-                            
-                                context.strokeStyle = "#000";
-                            }
-                        }
+                var shot = availableShots[i];
+                
+                shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + " pts</li>";
+                
+                context.beginPath();
+                context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
+                context.fillStyle = 'rgba(0,0,0,.5)';
+                
+                context.fill();
+                context.lineWidth = 1;
+                context.strokeStyle = '#003300';
+                context.stroke();
+                
+                context.fillStyle = "white";
+                context.textAlign = "center";
+                context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
+            }           
+            
+            shotRanking.innerHTML = "<ul>" + shotRankingHtml + "</ul>";
+                                    
+        }
+                
+        //draw theoritical lines
+        
+        if(showLines) {
+                        
+            context.strokeStyle = "#ff0096";
+            
+            var lineCounter = 0;
+            for(var i = 100 ; i < rotationPointY ; i+=20) {
+                
+                context.beginPath();
+                context.moveTo(leftWall, i);
+                context.lineTo(rotationPointX,rotationPointY);
+                context.closePath();
+                context.stroke();
+                lineCounter++;
+                
+                context.beginPath();
+                context.moveTo(rightWall, i);
+                context.lineTo(rotationPointX,rotationPointY);
+                context.closePath();
+                context.stroke();
+                
+                lineCounter++;
+            
+            }
+            
+            for(var i = 35 ; i <= iPhoneScreenWidth - 35 ; i+=10) {
+                
+                context.beginPath();
+                context.moveTo(i, 100);
+                context.lineTo(rotationPointX,rotationPointY);
+                context.closePath();
+                context.stroke();
+                lineCounter++;
+            
+            }
+                        
+            context.strokeStyle = "#000";
+        }
+        
+        var bestShot = grid.bestShot();                    
+        
+        if(bestShot) {
+            if(typeof bestShot.touchPoints != "undefined" && bestShot.touchPoints.length > 0) {
+                
+                context.strokeStyle = "#ff0096";
+                for(var i = 0 ; i < bestShot.touchPoints.length ; i++) {
+                    context.beginPath();
+                    context.moveTo(bestShot.touchPoints[i].touchPoint.x, bestShot.touchPoints[i].touchPoint.y);
+                    context.lineTo(rotationPointX,rotationPointY);
+                    context.closePath();
+                    context.stroke();
+                }
+                
+                
+                context.strokeStyle = "#000";
+            }
+        
+        
+            var bestTouchPoint = bestShot.bestTouchPoint();
+            
+       /*     if(!shooterBallColor) {
+                bestTouchPoint = false;
+                bestTouchPointTemp = bestTouchPoint;
+            }
+            
+            */
+            
+            if(bestTouchPoint) {
+                if(bestTouchPointTemp == null)
+                    bestTouchPointTemp = bestTouchPoint;
+                
+                if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
+                    bestTouchPointTemp = bestTouchPoint;
                     
-                    }
+                    bestTouchPoint.moveRobot();
+                }
+
+                if(typeof bestTouchPoint != "undefined") {
+                    
+                    context.strokeStyle = "#000";
+                    
+                    context.beginPath();
+                    context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
+                    context.lineTo(rotationPointX,rotationPointY);
+                    context.closePath();
+                    context.stroke();
+                
+                    context.strokeStyle = "#000";
+                }
+            }
         
-                    setTimeout(readScreen,0);
+        }
         
+        
+        GameEvents.setConditions({
+            "shooterBallColor" : shooterBallColor
+        });
+
+        setTimeout(readScreen,0);
+
       }
       
       readScreen(1);
@@ -585,7 +611,7 @@ exec(command,(error, stdout, stderr) => {
                 });            
         }
         
-       document.getElementById("canvas").addEventListener("mousemove", stylusPos);
+    //   document.getElementById("canvas").addEventListener("mousemove", stylusPos);
       
     //    document.getElementById("canvas").addEventListener("mousedown",stylusDown);
       //  document.getElementById("canvas").addEventListener("mouseup",stylusUp);
