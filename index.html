@@ -69,6 +69,10 @@ var debug = false;
 
 var displayBubbleColor = 'transparent';
 
+var robotMoving = false;
+
+var readyToShoot = false;
+
 /*
 
 setTimeout(function(){
@@ -498,12 +502,12 @@ exec(command,(error, stdout, stderr) => {
         
             var bestTouchPoint = bestShot.bestTouchPoint();
             
-       /*     if(!shooterBallColor) {
+            if(!shooterBallColor) {
                 bestTouchPoint = false;
                 bestTouchPointTemp = bestTouchPoint;
             }
             
-            */
+            
             
             if(bestTouchPoint) {
                 if(bestTouchPointTemp == null)

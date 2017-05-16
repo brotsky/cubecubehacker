@@ -10,8 +10,42 @@ function TouchPoint(x,y) {
         
         var command = "/usr/local/bin/axi down; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi up;";
         
-     //   console.log(command);
-        return;
+        if(readyToShoot)
+            command += " /usr/local/bin/axi up;";
+            
+            
+            if(!robotMoving) {
+                robotMoving = true;
+                
+                exec(command,(error, stdout, stderr) => {
+                      
+                      robotMoving = false;
+                      
+                      if (error) {
+                        console.error(`exec error: ${error}`);
+                        return;
+                      }
+                      console.log(`stdout: ${stdout}`);
+                      console.log(`stderr: ${stderr}`);
+                      
+                      
+                      
+                      
+                    });
+            } else {
+                setTimeout(this.moveRobot, 100);
+            }
+            
+            
+            
+        
+        
+    }
+    
+    this.fireShot = function() {
+                
+        var command = "/usr/local/bin/axi up;";
+        
         if(!debug)
             exec(command,(error, stdout, stderr) => {
                   if (error) {
@@ -22,8 +56,9 @@ function TouchPoint(x,y) {
                   console.log(`stderr: ${stderr}`);
                 });
         
-        
     }
+    
+    
     
     return;
 }

@@ -1,5 +1,7 @@
 function GameEvents() {
     
+    
+    
     this.lastEvent = false;
     this.latestEvent = false;
     
@@ -127,11 +129,68 @@ function GameEvents() {
     
     this.shotFired = function() {
         console.log("shot fired");
+        
+        
+        readyToShoot = false;
+        
+        var bestShot = grid.bestShot();                    
+        
+        if(bestShot) {
+        
+            var bestTouchPoint = bestShot.bestTouchPoint();
+            
+            if(bestTouchPoint) {
+                if(bestTouchPointTemp == null)
+                    bestTouchPointTemp = bestTouchPoint;
+                
+                if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
+                    bestTouchPointTemp = bestTouchPoint;
+                    
+                    bestTouchPoint.moveRobot();
+                } else {
+                    setTimeout(this.shotFired, 100);
+                }
+            } else {
+                setTimeout(this.shotFired, 100);
+            }
+        } else {
+            setTimeout(this.shotFired, 100);
+        }
+        
     }
     
     this.readyToShoot = function() {
         grid.bubblesAlreadyRemoved = [];
         console.log("ready to shoot");
+        
+        readyToShoot = true;
+        
+            var command = "/usr/local/bin/axi up;";
+        
+        
+        
+                
+                if(!robotMoving) {
+                    robotMoving = true;
+                    
+                    exec(command,(error, stdout, stderr) => {
+                        
+                            robotMoving = false;
+                        
+                          if (error) {
+                            console.error(`exec error: ${error}`);
+                            return;
+                          }
+                          console.log(`stdout: ${stdout}`);
+                          console.log(`stderr: ${stderr}`);
+                          
+                          
+                        });
+                } else {
+                setTimeout(this.readyToShoot, 100);
+            }
+            
+        
     }
     
     this.gridHasChanged = function() {
