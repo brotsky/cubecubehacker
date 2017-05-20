@@ -39,21 +39,57 @@ var context;
 var showLines = false;
 
 var m, b, deltaX, deltaY, wall, wallX, wallY, wallB, iData;
-    
-var iPhoneScreenWidth = 416 * 1.5;
-var iPhoneScreenHeight = 738 * 1.5;
 
-var iPhoneScreenWidthInches = 2.7 * 2;
-var iPhoneScreenHeightInches = 4.8 * 2;
 
+var device = "iPhone" //could be iPhone or iPad
+
+var iPhoneScreenWidth;
+var iPhoneScreenHeight;
+var iPhoneScreenWidthInches;
+var iPhoneScreenHeightInches;
 var widthRatio = iPhoneScreenWidthInches / iPhoneScreenWidth;
 var heightRatio = iPhoneScreenHeightInches / iPhoneScreenHeight;
+var rightWall;
+var leftWall;
+var rotationPointX;
+var rotationPointY; 
 
-var rightWall = (391 / 416) * iPhoneScreenWidth;
-var leftWall = (30 / 416) * iPhoneScreenWidth;
+if (device === "iPad") {
+    
+iPhoneScreenWidth = 640 * 1.5;
+iPhoneScreenHeight = 960 * 1.5;
+
+iPhoneScreenWidthInches = 7.31 * 2;
+iPhoneScreenHeightInches = 9.5 * 2;
+
+rightWall = (391 / 416) * iPhoneScreenWidth;
+leftWall = (30 / 416) * iPhoneScreenWidth;
+
+rotationPointX = (208 / 640) * iPhoneScreenWidth;
+rotationPointY = (610 / 960) * iPhoneScreenHeight; 
+
+document.getElementById("canvas").style.height = "300px";
+
+    
+} else if (device === "iPhone") {
+    
+iPhoneScreenWidth = 416 * 1.5;
+iPhoneScreenHeight = 738 * 1.5;
+
+iPhoneScreenWidthInches = 2.7 * 2;
+iPhoneScreenHeightInches = 4.8 * 2;
+
+rightWall = (391 / 416) * iPhoneScreenWidth;
+leftWall = (30 / 416) * iPhoneScreenWidth;
+
+rotationPointX = (208 / 416) * iPhoneScreenWidth;
+rotationPointY = (610 / 738) * iPhoneScreenHeight;
+
+document.getElementById("canvas").style.height = "1107px"; 
+
+}
         
-var rotationPointX = (208 / 416) * iPhoneScreenWidth;
-var rotationPointY = (610 / 738) * iPhoneScreenHeight; 
+
 
 var shooterBallColor, onDeckBallColor;
 
@@ -72,6 +108,8 @@ var displayBubbleColor = 'transparent';
 var robotMoving = false;
 
 var readyToShoot = false;
+
+
 
 /*
 
@@ -108,8 +146,8 @@ exec(command,(error, stdout, stderr) => {
     -webkit-flex-direction: column;
   }
   video {
-    width: 414px;
-    height: 736px;
+    width: 768px;
+    height: 1024px;
 /*
     width: 1080px;
     height: 1920px;
@@ -230,7 +268,10 @@ exec(command,(error, stdout, stderr) => {
   </select>
   <video id="iphone-screen-stream" autoplay></video>
   
-  <canvas id="canvas" width="416" height="738"></canvas>
+  <canvas id="canvas" width="768" height="1024"></canvas>
+  
+<!--   <canvas id="canvas" width="416" height="738"></canvas> -->
+
   <canvas id="timer" width="50" height="50"></canvas>
   
   <p><button id="enable-capture">Enable Capture</button></p>

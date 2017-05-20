@@ -167,10 +167,10 @@ function onAccessApproved(desktop_id) {
       mandatory: {
         chromeMediaSource: 'desktop',
         chromeMediaSourceId: desktop_id,
-        minWidth: 414,
-        maxWidth: 414,
-        minHeight: 736,
-        maxHeight: 736
+        minWidth: 640,
+        maxWidth: 640,
+        minHeight: 1107,
+        maxHeight: 1107
       }
     }
   }, gotStream, getUserMediaError);
