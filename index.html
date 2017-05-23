@@ -462,7 +462,7 @@ exec(command,(error, stdout, stderr) => {
                                 
                 var shot = availableShots[i];
                 
-                shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + " pts</li>";
+                shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + "-" + shot.isBlocker() + " pts</li>";
                 
                 context.beginPath();
                 context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
@@ -473,7 +473,12 @@ exec(command,(error, stdout, stderr) => {
                 context.strokeStyle = '#003300';
                 context.stroke();
                 
-                context.fillStyle = "white";
+                if(shot.isBlocker()){
+                  context.fillStyle = "red";
+                }
+                else{
+                  context.fillStyle = "white";
+                }
                 context.textAlign = "center";
                 context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
             }           

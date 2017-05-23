@@ -34,6 +34,30 @@ function Bubble(x,y,color,iData) {
         
         return points;
     }
+
+    this.truePoints = function(withColor = shooterBallColor) {
+        var points = 0;
+        
+        if(this.color !== 0)
+            return points;
+        
+        var cluster = this.getCluster(withColor);
+                
+        for(var i = 0 ; i < cluster.size ; i++) {
+            if(i < 3)
+                points += 10;
+            else
+                points += 10 * (i - 2);
+        }
+        
+        if(cluster.size > 2) {
+            var unattachedCluster = this.getUnattachedCluster(cluster.bubbles);
+            
+            points += unattachedCluster.length * 100;            
+        }
+        
+        return points;
+    }
     
     this.getCenterX = function() {
         var centerX = 68 + this.x * gridSpacing;
@@ -277,6 +301,31 @@ function Bubble(x,y,color,iData) {
         }
         
         return array;
+    }
+
+    this.isBlocker = function(withColor = shooterBallColor) {
+
+        var blockerPoints = 0;
+
+        var colors = grid.currentColors();
+
+        console.log("colors",colors);
+
+        for(var i = 0 ; i < colors.length ; i++) {
+            var color = colors[i];
+            if(color != withColor) {
+                var points = this.truePoints(color);
+                if(points > blockerPoints) {
+                    blockerPoints = points;
+                }
+            }
+            
+        }
+
+        if(blockerPoints > this.truePoints())
+            return true;
+        
+        return false;
     }
     
     return;
