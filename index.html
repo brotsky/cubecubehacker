@@ -85,7 +85,7 @@ leftWall = (30 / 416) * iPhoneScreenWidth;
 rotationPointX = (208 / 416) * iPhoneScreenWidth;
 rotationPointY = (610 / 738) * iPhoneScreenHeight;
 
-document.getElementById("canvas").style.height = "1107px"; 
+//document.getElementById("canvas").style.height = "1107px"; 
 
 }
         
@@ -473,7 +473,7 @@ exec(command,(error, stdout, stderr) => {
                 context.strokeStyle = '#003300';
                 context.stroke();
                 
-                if(shot.isBlocker()){
+                if(shot.isBlocker() == "blocker"){
                   context.fillStyle = "red";
                 }
                 else{

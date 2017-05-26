@@ -17,6 +17,9 @@ function TouchPoint(x,y) {
             if(!robotMoving) {
                 robotMoving = true;
                 
+
+                return;
+
                 exec(command,(error, stdout, stderr) => {
                       
                       robotMoving = false;
