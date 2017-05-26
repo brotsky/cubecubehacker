@@ -303,57 +303,88 @@ function Bubble(x, y, color, iData) {
         return array;
     }
 
-    this.hasSamePointValue = function(withColor = shooterBallColor) {
+    var bubbleInfo = {
+        location: [x, y],
+        color: "red",
+        points: 0
 
-        var avShots = grid.availableShots();
+    };
 
-        for (var i = 0; i < avShots.length; i++) {
+    var sameBlockerArr = [];
 
-            if (avShots[i].truePoints() == this.truePoints()) {
+    this.hasSamePointValue = function() {
 
-                return true;
+        var availShots = grid.availableShots();
 
+        for (var i = 0; i < availShots.length; i++) {
+            if (availShots[i].blocker().color == this.blocker().color && availShots[i].blocker().points == this.blocker().points) {
+                
+                sameBlockerArr.push(availShots[i].blocker());
+                //sameCluster function with availShots[i] and blocker
+                // availShots[i].blocker();
             }
+            return availShots[i].blocker();
+            //return sameBlockerArr;
+            //console.log(bubbleInfo);
+        }
+
+        return bubbleInfo;
+    }
+
+    this.sameCluster = function(withColor = shooterBallColor) {
+        var test = this.hasSamePointValue();
+
+        console.log(test);
+
+
+    }
+
+    this.disappearingCluster = function() {
+
+        if (this.truePoints() >= 30) {
+            return true;
         }
 
         return false;
     }
 
-    this.sameCluster = function(withColor = shooterBallColor) {
-
-
-
-    }
-
-    this.isBlocker = function(withColor = shooterBallColor) {
-
+    this.blocker = function(withColor = shooterBallColor) {
         var blockerPoints = 0;
 
         var colors = grid.currentColors();
 
-        var avShots = grid.availableShots();
-       
-        if(this.hasSamePointValue()) {
+        for (var i = 0; i < colors.length; i++) {
+            var color = colors[i];
+            if (color != withColor) {
+                var points = this.truePoints(color);
+                if (points > blockerPoints) {
+                    bubbleInfo.location[0] = this.x;
+                    bubbleInfo.location[1] = this.y;
+                    bubbleInfo.color =  color;
+                    bubbleInfo.points = points;
 
+                    blockerPoints = points;
+                }
+            }
 
         }
+
+        return bubbleInfo;
+    }
+
+    this.isBlocker = function(withColor = shooterBallColor) {
+        this.hasSamePointValue();
+        //console.log(bubbleInfo);
+
         //console.log("colors",colors);
 
 
-        if (this.truePoints() < 30) {
-            for (var i = 0; i < colors.length; i++) {
-                var color = colors[i];
-                if (color != withColor) {
-                    var points = this.truePoints(color);
-                    if (points > blockerPoints) {
-                        blockerPoints = points;
-                    }
-                }
+        if (!this.disappearingCluster()) {
+            if (this.blocker() > this.truePoints()) {
+                this.hasSamePointValue();
 
+                //return "blocker";
             }
-
-            if (blockerPoints > this.truePoints())
-                return "blocker";
         } else {
             return "dissBall"
         }
