@@ -111,7 +111,7 @@ function showSources() {
     //  console.log("Name: " + source.name);
       
       
-      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo" || source.name == "shooter demo play 3" || source.name == "debugger") {
+      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo" || source.name == "iPad shooter demo 1.mov" || source.name == "debugger") {
           
           if(source.name == "debugger")
             debug = true;
@@ -167,10 +167,14 @@ function onAccessApproved(desktop_id) {
       mandatory: {
         chromeMediaSource: 'desktop',
         chromeMediaSourceId: desktop_id,
-        minWidth: 640,
-        maxWidth: 640,
-        minHeight: 1107,
-        maxHeight: 1107
+        minWidth: 768,
+        // minWidth: 640,
+        maxWidth: 768,
+         // maxWidth: 640,
+        minHeight: 1024,
+        // minHeight: 1107,
+        maxHeight: 1024
+        // maxHeight: 1107
       }
     }
   }, gotStream, getUserMediaError);

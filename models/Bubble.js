@@ -60,7 +60,11 @@ function Bubble(x, y, color, iData) {
     }
 
     this.getCenterX = function() {
-        var centerX = 68 + this.x * gridSpacing;
+        // for iPhone:
+        // var centerX = 68 + this.x * gridSpacing;
+
+        // for iPad:
+        var centerX = 120 + this.x * gridSpacing;
 
         if (this.y % 2 === 1)
             centerX += gridSpacing / 2;
@@ -70,7 +74,11 @@ function Bubble(x, y, color, iData) {
     }
 
     this.getCenterY = function() {
-        return 204 + this.y * gridSpacing;
+        // for iPhone:
+        // return 204 + this.y * gridSpacing;
+
+        //for iPad:
+        return 130 + this.y * gridSpacing;
     }
 
     this.color = color;
