@@ -432,6 +432,7 @@ exec(command,(error, stdout, stderr) => {
                         if(j == 5 && i == 3)
                             iData = videoContext.getImageData(Math.round( centerX),  Math.round( centerY  + .3 * gridSpacing), 1, 1);
                         
+                        
                         var bubbleColor = getBubbleColor(iData);
                         
                         displayBubbleColor = 'transparent';
@@ -498,7 +499,28 @@ exec(command,(error, stdout, stderr) => {
             }           
             
             shotRanking.innerHTML = "<ul>" + shotRankingHtml + "</ul>";
-                                    
+            
+            var bubblesLeft = 0;
+            
+            for(var i = 0 ; i < 5 ; i++) {
+                context.beginPath();
+                context.arc(140 + i * 39.5, 948 , 16, 0, 2 * Math.PI, false);
+                context.strokeStyle = 'rgba(170,170,170,.5)';
+                context.stroke();
+                
+                var upcomingBubble = videoContext.getImageData(140 + i * 39.5, 948 - 8, 1, 1);
+        
+                var upcomingBubbleColor = getBubbleColor(upcomingBubble);
+                                
+                if(upcomingBubbleColor === "silver")
+                    bubblesLeft++;
+            }
+                        
+            var tempHTML = shotRanking.innerHTML;
+            
+            tempHTML += "<div style='padding-left: 40px;'><strong>Bubbles Left:</strong> " + bubblesLeft + "</div>";
+            
+            shotRanking.innerHTML = tempHTML;                        
         }
                 
         //draw theoritical lines

@@ -29,6 +29,7 @@ var getBubbleColor = function(iData) {
     var red2 = [186,52,33];
     var lightpurple = [204,203,250];
     var darkpurple = [74,73,115];
+    var silver = [170, 171, 169];
     
                 
     if(colorArrayMatches(iData.data,purple))
@@ -69,6 +70,8 @@ var getBubbleColor = function(iData) {
         return "lightpurple";
     else if(colorArrayMatches(iData.data,darkpurple))
         return "darkpurple";
+    else if(colorArrayMatches(iData.data,silver))
+        return "silver";
     else
         return false;
 }
