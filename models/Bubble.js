@@ -312,10 +312,8 @@ function Bubble(x, y, color, iData) {
     }
 
     var bubbleInfo = {
-        location: [x, y],
         color: "red",
         points: 0
-
     };
 
     var sameBlockerArr = [];
@@ -326,7 +324,7 @@ function Bubble(x, y, color, iData) {
 
         for (var i = 0; i < availShots.length; i++) {
             if (availShots[i].blocker().color == this.blocker().color && availShots[i].blocker().points == this.blocker().points) {
-                
+
                 sameBlockerArr.push(availShots[i].blocker());
                 //sameCluster function with availShots[i] and blocker
                 // availShots[i].blocker();
@@ -366,9 +364,7 @@ function Bubble(x, y, color, iData) {
             if (color != withColor) {
                 var points = this.truePoints(color);
                 if (points > blockerPoints) {
-                    bubbleInfo.location[0] = this.x;
-                    bubbleInfo.location[1] = this.y;
-                    bubbleInfo.color =  color;
+                    bubbleInfo.color = color;
                     bubbleInfo.points = points;
 
                     blockerPoints = points;
@@ -379,29 +375,77 @@ function Bubble(x, y, color, iData) {
 
         return bubbleInfo;
     }
+    this.availShotsArray = function() {
 
-    this.isBlocker = function(withColor = shooterBallColor) {
-        this.hasSamePointValue();
-        //console.log(bubbleInfo);
+        var availShotsArr = []; // this is going to be the loaded available shots object array
+        var sameColorArr = []; // this is the array to hold each color/point array combo
+        var availableShots = grid.availableShots();
 
-        //console.log("colors",colors);
+        for (var i = 0; i < availableShots.length; i++) {
 
-
-        if (!this.disappearingCluster()) {
-            if (this.blocker() > this.truePoints()) {
-                this.hasSamePointValue();
-
-                //return "blocker";
-            }
-        } else {
-            return "dissBall"
+            availShotsArr.push(availableShots[i].blocker()); // This pushes all the available shot objects into an array
         }
 
 
-        return "notBlocker";
+        for (var i = 1; i < availShotsArr.length; i++) {
+
+            if (sameColorArr.length == 0) {
+                var firstArr = [];
+                firstArr.push(availShotsArr[0]);
+                sameColorArr.push(firstArr);
+            } // this creates the first array value for the array to carry all of the different array values
+            else {
+                for (var prop in sameColorArr[i]) {
+                    if ((availShotsArr[i].color === sameColorArr[i].color) && (availShotsArr[i].points === sameColorArr[i].points)) {
+
+                        sameColorArr[i].push(availShotsArr[i]);
+                        
+                    } else {
+
+                        var newArr = [];
+                        newArr.push(availShotsArr[i]);
+                        sameColorArr.push(newArr);
+                    }
+                }
+                //     for (var k = 0; k < sameColorArr.length; k++){
+                //         if(availShotsArr[i].color == sameColorArr[k].color && availShotsArr[i].points == sameColorArr[k].points)
+                //     } // This needs to check and see if an array value within sameColorArr matches that of an availShotsArr value. If one does then push it into the array containing these values.
+                // }
+
+                // for (var j = i + 1; j < availShotsArr.length; j++) {
+                //     if (availShotsArr[i].color == availShotsArr[j].color && availShotsArr[i].points == availShotsArr[j].points) {
+                //         sameColorArr.push(availShotsArr[i].blocker());
+                //     } // If one does not, then create a new array and push this into the new array in sameColorArr.
+                // }
+            }
+
+            return sameColorArr;
+        }
+
     }
 
-    return;
-}
+        this.isBlocker = function(withColor = shooterBallColor) {
+            this.hasSamePointValue();
+            //console.log(bubbleInfo);
 
-module.exports = new Bubble();
+            //console.log("colors",colors);
+
+
+            if (!this.disappearingCluster()) {
+                if (this.blocker() > this.truePoints()) {
+                    this.hasSamePointValue();
+
+                    //return "blocker";
+                }
+            } else {
+                return "dissBall"
+            }
+
+
+            return "notBlocker";
+        }
+
+        return;
+    }
+
+    module.exports = new Bubble();
