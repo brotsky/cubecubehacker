@@ -318,42 +318,6 @@ function Bubble(x, y, color, iData) {
 
     var sameBlockerArr = [];
 
-    this.hasSamePointValue = function() {
-
-        var availShots = grid.availableShots();
-
-        for (var i = 0; i < availShots.length; i++) {
-            if (availShots[i].blocker().color == this.blocker().color && availShots[i].blocker().points == this.blocker().points) {
-
-                sameBlockerArr.push(availShots[i].blocker());
-                //sameCluster function with availShots[i] and blocker
-                // availShots[i].blocker();
-            }
-            return availShots[i].blocker();
-            //return sameBlockerArr;
-            //console.log(bubbleInfo);
-        }
-
-        return bubbleInfo;
-    }
-
-    this.sameCluster = function(withColor = shooterBallColor) {
-        var test = this.hasSamePointValue();
-
-        console.log(test);
-
-
-    }
-
-    this.disappearingCluster = function() {
-
-        if (this.truePoints() >= 30) {
-            return true;
-        }
-
-        return false;
-    }
-
     this.blocker = function(withColor = shooterBallColor) {
         var blockerPoints = 0;
 
@@ -375,75 +339,68 @@ function Bubble(x, y, color, iData) {
 
         return bubbleInfo;
     }
-    this.availShotsArray = function() {
 
-        var availShotsArr = []; // this is going to be the loaded available shots object array
-        var sameColorArr = []; // this is the array to hold each color/point array combo
-        var availableShots = grid.availableShots();
+    this.isMatch = function(availShot) {
+        var availShot = availShot;
 
-        for (var i = 0; i < availableShots.length; i++) {
-
-            availShotsArr.push(availableShots[i].blocker()); // This pushes all the available shot objects into an array
+        if((this.blocker().color === availShot.blocker().color) && (this.blocker().points === availShot.blocker().points)){
+            return true;
         }
 
+        return false;
+    }
 
-        for (var i = 1; i < availShotsArr.length; i++) {
+    this.sharedCluster = function(matchShot) {
+        var matchShot = matchShot; 
+        var p1 = this.getCluster(this.blocker().color);
+        var p2 = matchShot.getCluster(matchShot.blocker().color);
 
-            if (sameColorArr.length == 0) {
-                var firstArr = [];
-                firstArr.push(availShotsArr[0]);
-                sameColorArr.push(firstArr);
-            } // this creates the first array value for the array to carry all of the different array values
-            else {
-                for (var prop in sameColorArr[i]) {
-                    if ((availShotsArr[i].color === sameColorArr[i].color) && (availShotsArr[i].points === sameColorArr[i].points)) {
-
-                        sameColorArr[i].push(availShotsArr[i]);
-                        
-                    } else {
-
-                        var newArr = [];
-                        newArr.push(availShotsArr[i]);
-                        sameColorArr.push(newArr);
-                    }
+        for (var i = 0; i < p1.size; i++) {
+            for (var j = 0; j < p2.size; j++) {
+                if ((p1.bubbles[i].x === p2.bubbles[j].x) && (p1.bubbles[i].y === p2.bubbles[j].y)) {
+                    return true;
                 }
-                //     for (var k = 0; k < sameColorArr.length; k++){
-                //         if(availShotsArr[i].color == sameColorArr[k].color && availShotsArr[i].points == sameColorArr[k].points)
-                //     } // This needs to check and see if an array value within sameColorArr matches that of an availShotsArr value. If one does then push it into the array containing these values.
-                // }
-
-                // for (var j = i + 1; j < availShotsArr.length; j++) {
-                //     if (availShotsArr[i].color == availShotsArr[j].color && availShotsArr[i].points == availShotsArr[j].points) {
-                //         sameColorArr.push(availShotsArr[i].blocker());
-                //     } // If one does not, then create a new array and push this into the new array in sameColorArr.
-                // }
             }
-
-            return sameColorArr;
         }
+
+        return false;
+    }
+
+    this.disappearingCluster = function() {
+
+        if (this.truePoints() >= 30) {
+            return true;
+        }
+
+        return false;
+    }
+
+    this.compareCluster = function(cluster) {
+        var cluster = cluster;
+
+        
 
     }
 
-        this.isBlocker = function(withColor = shooterBallColor) {
-            this.hasSamePointValue();
-            //console.log(bubbleInfo);
+    this.isBlocker = function(withColor = shooterBallColor) {
+        var availShots = [];
+        availShots = grid.availableShots();
 
-            //console.log("colors",colors);
-
-
-            if (!this.disappearingCluster()) {
-                if (this.blocker() > this.truePoints()) {
-                    this.hasSamePointValue();
-
-                    //return "blocker";
+        if (!this.disappearingCluster()) {
+            if (this.blocker().points > this.truePoints()) {
+                for (var i = 0; i < availShots.length; i++) {
+                    if(this.isMatch(availShots[i]))
+                        if(this.sharedCluster(availShots[i]))
+                            return false;
                 }
-            } else {
-                return "dissBall"
             }
-
-
-            return "notBlocker";
+        } else {
+            return false;
         }
+
+
+        return true;
+    }
 
         return;
     }

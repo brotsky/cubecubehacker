@@ -488,7 +488,7 @@ exec(command,(error, stdout, stderr) => {
                 context.strokeStyle = '#003300';
                 context.stroke();
                 
-                if(shot.isBlocker() == "blocker"){
+                if(shot.isBlocker() === true){
                   context.fillStyle = "red";
                 }
                 else{

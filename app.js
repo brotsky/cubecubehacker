@@ -111,7 +111,7 @@ function showSources() {
     //  console.log("Name: " + source.name);
       
       
-      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo" || source.name == "iPad shooter demo 1" || source.name == "debugger") {
+      if(source.name == "Movie Recording" || source.name == "CubeCube Demo" || source.name == "spinner demo" || source.name == "iPad shooter demo 1.mov" || source.name == "debugger") {
           
           if(source.name == "debugger")
             debug = true;
