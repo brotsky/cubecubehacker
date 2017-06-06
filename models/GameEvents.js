@@ -130,6 +130,8 @@ function GameEvents() {
     this.shotFired = function() {
         console.log("shot fired");
         
+        colorArray = grid.currentColors();
+        colorCount = colorArray.length;
         
         readyToShoot = false;
         
@@ -162,6 +164,9 @@ function GameEvents() {
     this.readyToShoot = function() {
         grid.bubblesAlreadyRemoved = [];
         console.log("ready to shoot");
+
+        colorArray = grid.currentColors();
+        colorCount = colorArray.length;
         
         readyToShoot = true;
         
