@@ -129,7 +129,7 @@ function GameEvents() {
     
     this.shotFired = function() {
         console.log("shot fired");
-        
+        availShots = grid.availableShots();
         colorArray = grid.currentColors();
         colorCount = colorArray.length;
         

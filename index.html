@@ -301,7 +301,11 @@ exec(command,(error, stdout, stderr) => {
   <script>
       
   var colorArray = [];
-  var colorCount = 0; 
+  var colorCount = 0;
+  var availShots = [];
+  var thisBlocker;
+  // var p1;
+  var truePoints;
 
     var grid = new Grid;
 
@@ -481,6 +485,9 @@ exec(command,(error, stdout, stderr) => {
             for(var i = 0 ; i < availableShots.length ; i++) {
                                 
                 var shot = availableShots[i];
+                thisBlocker = shot.blocker();
+                truePoints = shot.truePoints();
+                // p1 = shot.getCluster(thisBlocker.color);
                 
                 shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + "-" + shot.isBlocker() + " pts</li>";
                 

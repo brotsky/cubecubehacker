@@ -342,7 +342,7 @@ function Bubble(x, y, color, iData) {
 
     this.isMatch = function(availShot) {
         var availShot = availShot;
-        var shotOne = this.blocker();
+        var shotOne = thisBlocker;
         var shotTwo = availShot.blocker();
 
         if((shotOne.color === shotTwo.color) && (shotOne.points === shotTwo.points)){
@@ -354,7 +354,7 @@ function Bubble(x, y, color, iData) {
 
     this.sharedCluster = function(matchShot) {
         var matchShot = matchShot; 
-        var p1 = this.getCluster(this.blocker().color);
+        var p1 = this.getCluster(thisBlocker.color);
         var p2 = matchShot.getCluster(matchShot.blocker().color);
 
         for (var i = 0; i < p1.size; i++) {
@@ -368,7 +368,8 @@ function Bubble(x, y, color, iData) {
 
     this.disappearingCluster = function() {
 
-        if (this.truePoints() >= 30) {
+        if (truePoints >= 30) {
+        // if (this.truePoints() >= 30) {
             return true;
         }
 
@@ -383,11 +384,11 @@ function Bubble(x, y, color, iData) {
     }
 
     this.isBlocker = function(withColor = shooterBallColor) {
-        var availShots = [];
-        availShots = grid.availableShots();
+        // var availShots = [];
+        // availShots = grid.availableShots();
 
         if (!this.disappearingCluster()) {
-            if (this.blocker().points > this.truePoints()) {
+            if (thisBlocker.points > truePoints) {
                 for (var i = 0; i < availShots.length; i++) {
                     if(this.isMatch(availShots[i]))
                         if(this.sharedCluster(availShots[i]))
