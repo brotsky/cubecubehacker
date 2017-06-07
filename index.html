@@ -564,6 +564,10 @@ exec(command,(error, stdout, stderr) => {
             
             shotRanking.innerHTML = tempHTML;
 
+            var moreTempHTML = shotRanking.innerHTML;
+            moreTempHTML += "<div style='padding-left: 40px;'><strong>Rows To Be Added:</strong> " + grid.numberOfRows() + "</div>";
+            shotRanking.innerHTML = moreTempHTML;
+
         }
                 
         //draw theoritical lines

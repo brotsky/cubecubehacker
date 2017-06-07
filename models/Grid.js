@@ -282,6 +282,23 @@ function Grid() {
     this.colorCount = function() {        
         return this.currentColors().length;        
     }
+
+    this.numberOfRows = function() {
+        var colorCount = this.colorCount();
+        if (colorCount === 6) {
+            return 1;
+        } else if (colorCount === 5) { 
+            return 2;
+        } else if (colorCount === 4) {
+            return 3;
+        } else if (colorCount === 3) {
+            return 4;
+        } else if (colorCount === 2) {
+            return 5;
+        } else if (colorCount === 1) {
+            return 6;
+        }
+    }
     
     return;
 }

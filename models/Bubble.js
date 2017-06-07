@@ -386,7 +386,7 @@ function Bubble(x, y, color, iData) {
 //          function(data) { console.log(data); },
 //          function(xhr) { console.error(xhr); }
 // );
-    var turnOff = true;
+    var turnOff = false;
 
     // var functionConfig = require('./functionConfig.js');
 
