@@ -357,7 +357,7 @@ function Bubble(x, y, color, iData) {
         var p1 = this.getCluster(thisBlocker.color);
         var p2 = matchShot.getCluster(matchShot.blocker().color);
 
-        for (var i = 0; i < p1.size; i++) {
+        for (var i = 1; i < p1.size; i++) {
             if ((p1.bubbles[1].x === p2.bubbles[i].x) && (p1.bubbles[1].y === p2.bubbles[i].y)) 
                     return true;
         }
@@ -382,10 +382,19 @@ function Bubble(x, y, color, iData) {
         
 
     }
+//     loadJSON('functionConfig.json',
+//          function(data) { console.log(data); },
+//          function(xhr) { console.error(xhr); }
+// );
+    var turnOff = true;
+
+    // var functionConfig = require('./functionConfig.js');
 
     this.isBlocker = function(withColor = shooterBallColor) {
         // var availShots = [];
         // availShots = grid.availableShots();
+        if (turnOff)
+            return false;
 
         if (!this.disappearingCluster()) {
             if (thisBlocker.points > truePoints) {

@@ -901,6 +901,7 @@ function shoot(){
   //  output.appendChild(snapshot);
 }
 
+
 function gridToPrint(grid) {
     var str = "";
     for(var i = 0 ; i < grid.length ; i++) {

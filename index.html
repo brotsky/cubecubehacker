@@ -8,7 +8,7 @@
 <script src="stats.min.js"></script>
 
 <script type="text/javascript">
-    
+    // var functionConfig = require('./functionConfig.js');
     var Tesseract = require('tesseract.js');
     var Robot = require('./models/Robot.js');
     var GameEvents = require('./models/GameEvents.js');
@@ -284,6 +284,11 @@ exec(command,(error, stdout, stderr) => {
       <ul>
       </ul>
   </div>
+
+  <div style="position: relative; top: 540px; padding: 10px; background-color: #000; color: #FFF; width: 100%; font-size: 25pt;" id="execution-time">Execution Time: <span id="changing-time"></span> milliseconds / <span id="changing-time-second"></span> fps</div>
+  <button style="position: relative; top: 540px;" id="performancePauser">Pause!</button>
+  <button style="position: relative; top: 511px; left: 100px;" id="performanceResume">Resume!</button>
+
   
 <button onclick="shoot()" style="width: 64px;border: solid 2px #ccc;">Capture</button>
   
@@ -299,13 +304,28 @@ exec(command,(error, stdout, stderr) => {
 <script src="app.js"></script>
 
   <script>
-      
+  
+  var paused = false;
+  var t0;
+  var t1;
   var colorArray = [];
   var colorCount = 0;
   var availShots = [];
   var thisBlocker;
   // var p1;
   var truePoints;
+
+   document.getElementById("performancePauser").addEventListener('click',function () {
+        
+        paused = true;
+      
+    });
+   
+   document.getElementById("performanceResume").addEventListener('click',function () {
+        
+        paused = false;
+      
+    });
 
     var grid = new Grid;
 
@@ -321,7 +341,6 @@ exec(command,(error, stdout, stderr) => {
     
           
     window.onload = function() {
-                        
         document.getElementById('iphone-screen-stream').setAttribute("style", "width: " + iPhoneScreenWidth + "px; height: " + iPhoneScreenHeight + "px;");
         document.getElementById('canvas').setAttribute("width", iPhoneScreenWidth);
         document.getElementById('canvas').setAttribute("height", iPhoneScreenHeight);
@@ -336,15 +355,25 @@ exec(command,(error, stdout, stderr) => {
       context.strokeStyle = "#00901b";
       context.fillStyle = "#fff";
       context.font = '11px Helvetica';
-            
+  
       var readScreen = function(delay) {
-
+        t0 = performance.now();
         videoContext.drawImage(video, 0, 0, w, h);
 
         var timerContext = videoCanvas.getContext('2d');
             timerContext.drawImage(video,200,400,50,50);
         
         context.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (paused === false) {
+
+            var functionPerformance = document.getElementById("changing-time");
+            var performanceResult = t0 - t1;
+            functionPerformance.innerHTML = performanceResult.toPrecision(3);
+            var functionPerformanceSecond = document.getElementById("changing-time-second");
+            functionPerformanceSecond.innerHTML = (1000/performanceResult).toPrecision(4);
+
+        }
                 
         if(!isPlayingShooter(videoContext)) {
             setTimeout(readScreen,delay);
@@ -470,6 +499,7 @@ exec(command,(error, stdout, stderr) => {
             }
             
             grid.validateGrid();
+
             
             //create bubbles after validation
             
@@ -532,7 +562,8 @@ exec(command,(error, stdout, stderr) => {
             
             tempHTML += "<div style='padding-left: 40px;'><strong>Bubbles Left:</strong> " + bubblesLeft + "</div>";
             
-            shotRanking.innerHTML = tempHTML;                        
+            shotRanking.innerHTML = tempHTML;
+
         }
                 
         //draw theoritical lines
@@ -633,12 +664,14 @@ exec(command,(error, stdout, stderr) => {
         GameEvents.setConditions({
             "shooterBallColor" : shooterBallColor
         });
-
+        t1 = performance.now();
         setTimeout(readScreen,0);
+
 
       }
       
       readScreen(1);
+
             
       function stylusPos(event) {
             
@@ -708,6 +741,13 @@ exec(command,(error, stdout, stderr) => {
                   console.log(`stderr: ${stderr}`);
                 });            
         }
+
+        // document.getElementById("performancePauser").addEventListener('click',function () {
+        
+        // console.log('hit');
+        // console.log(functionPerformance.innerHTML);
+      
+        // });
         
     //   document.getElementById("canvas").addEventListener("mousemove", stylusPos);
       
