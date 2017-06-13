@@ -1,3 +1,4 @@
+var controller = require('./controller.js');
 function Bubble(x, y, color, iData) {
 
     this.x = x;
@@ -377,20 +378,20 @@ function Bubble(x, y, color, iData) {
     }
 
     this.compareCluster = function(cluster) {
-        var cluster = cluster;
-
-        
-
+        let turnOff;
+        turnOff = controller.turnOffCompareCluster();
+        if (turnOff)
+            return false;
+        var cluster = cluster; 
     }
 //     loadJSON('functionConfig.json',
 //          function(data) { console.log(data); },
 //          function(xhr) { console.error(xhr); }
 // );
-    var turnOff = false;
-
-    // var functionConfig = require('./functionConfig.js');
 
     this.isBlocker = function(withColor = shooterBallColor) {
+        let turnOff;
+        turnOff = controller.turnOffIsBlocker();
         // var availShots = [];
         // availShots = grid.availableShots();
         if (turnOff)
