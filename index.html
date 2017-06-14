@@ -37,7 +37,14 @@
 var gridSpacing;
 var context;
 var showLines = false;
-
+var showLineToCoordinate = true;
+var coordinates;
+var Yjared;
+var Xjared;
+var newY;
+var coordArray = [];
+var topWall = 110;
+var topWallX;
 var m, b, deltaX, deltaY, wall, wallX, wallY, wallB, iData;
 
 
@@ -67,8 +74,8 @@ iPhoneScreenHeight = 1024;
 iPhoneScreenWidthInches = 6.67 * 2;
 iPhoneScreenHeightInches = 9.4 * 2;
 
-rightWall = (391 / 768) * iPhoneScreenWidth;
-leftWall = (30 / 768) * iPhoneScreenWidth;
+rightWall = (688 / 768) * iPhoneScreenWidth;
+leftWall = (95 / 768) * iPhoneScreenWidth;
 
 rotationPointX = (385 / 768) * iPhoneScreenWidth;
 rotationPointY = (910 / 1024) * iPhoneScreenHeight; 
@@ -568,10 +575,19 @@ exec(command,(error, stdout, stderr) => {
             moreTempHTML += "<div style='padding-left: 40px;'><strong>Rows To Be Added:</strong> " + grid.numberOfRows() + "</div>";
             shotRanking.innerHTML = moreTempHTML;
 
+            document.getElementById("canvas").addEventListener("mousemove", coordinatesFunction);
+            var moreTempHTML = shotRanking.innerHTML;
+            moreTempHTML += "<div style='padding-left: 40px;'><strong>Coordinates Mouse:</strong> " + coordinates + "</div>";
+            shotRanking.innerHTML = moreTempHTML;
+            
+            document.getElementById("canvas").addEventListener("mousemove", lineToCoordinate);
+            // document.getElementById("canvas").addEventListener("mouseout", lineToCoordinate);
+
         }
-                
+
+
         //draw theoritical lines
-        
+
         if(showLines) {
                         
             context.strokeStyle = "#ff0096";
@@ -608,6 +624,29 @@ exec(command,(error, stdout, stderr) => {
             }
                         
             context.strokeStyle = "#000";
+
+
+        }
+
+        if (showLineToCoordinate) {
+
+          context.strokeStyle = "white";
+          context.beginPath();
+          context.moveTo(Xjared,Yjared);
+          getWallCoordinates();
+          context.moveTo(coordArray[0], coordArray[1]);
+          context.lineTo(rotationPointX,rotationPointY);
+          context.closePath();
+          context.stroke();
+
+          if (Yjared > 131) {
+          secondLineCoordinates();
+          context.beginPath();
+          context.moveTo(topWallX,topWall);
+          context.lineTo(coordArray[0],coordArray[1]);
+          context.closePath();
+          context.stroke();
+          }
         }
         
         var bestShot = grid.bestShot();                    
@@ -650,8 +689,8 @@ exec(command,(error, stdout, stderr) => {
 
                 if(typeof bestTouchPoint != "undefined") {
                     
+
                     context.strokeStyle = "#000";
-                    
                     context.beginPath();
                     context.moveTo(bestTouchPoint.x, bestTouchPoint.y);
                     context.lineTo(rotationPointX,rotationPointY);
@@ -675,6 +714,57 @@ exec(command,(error, stdout, stderr) => {
       }
       
       readScreen(1);
+
+      function secondLineCoordinates() {
+
+        var changingX = (Xjared - rotationPointX);
+        let m = (Yjared - rotationPointY) / changingX;
+        topWallX = ((topWall - Yjared) / -m) + Xjared;
+        return topWallX;
+
+      }
+
+      function getWallCoordinates() {
+
+        var changingX = (Xjared - rotationPointX);
+        if (changingX === 0) {
+          changingX === 0.00001;
+        }
+        let m = (Yjared - rotationPointY) / changingX;
+
+        if (m > 0) {
+           newY = (m*(leftWall - Xjared)) + Yjared;
+           coordArray = [];
+           coordArray.push(leftWall);
+           coordArray.push(newY);
+           return coordArray;
+        } else {
+            newY = (m*(rightWall - Xjared)) + Yjared;
+            coordArray = [];
+            coordArray.push(rightWall);
+            coordArray.push(newY);
+            return coordArray;
+        }
+
+      }
+
+      function lineToCoordinate(event) {
+          Xjared = event.clientX - canvas.offsetLeft;
+          Yjared = event.clientY - canvas.offsetTop;
+      }
+
+
+      function coordinatesFunction(event) {
+          var canvas = document.getElementById("canvas");
+            
+            var x = event.clientX - canvas.offsetLeft;
+            var y = event.clientY - canvas.offsetTop;
+            
+            coordinates = "(" + x + ", " + y + ")";
+            // console.log(coordinates);
+            return coordinates;
+      }
+
 
             
       function stylusPos(event) {

@@ -1,4 +1,4 @@
-var controller = require('./controller.js');
+var settings = require('./settings.js');
 function Bubble(x, y, color, iData) {
 
     this.x = x;
@@ -379,7 +379,7 @@ function Bubble(x, y, color, iData) {
 
     this.compareCluster = function(cluster) {
         let turnOff;
-        turnOff = controller.turnOffCompareCluster();
+        turnOff = settings.turnOffCompareCluster();
         if (turnOff)
             return false;
         var cluster = cluster; 
@@ -391,7 +391,7 @@ function Bubble(x, y, color, iData) {
 
     this.isBlocker = function(withColor = shooterBallColor) {
         let turnOff;
-        turnOff = controller.turnOffIsBlocker();
+        turnOff = settings.turnOffIsBlocker();
         // var availShots = [];
         // availShots = grid.availableShots();
         if (turnOff)

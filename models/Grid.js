@@ -179,13 +179,13 @@ function Grid() {
                             
             for(var s = 0 ; s < sortedBubbles.length ; s++ ) {
                 
-                
-                
                 var shot = sortedBubbles[s];
-                
-                
-                var centerX = 68 + shot.x * gridSpacing;
-                var centerY = 204 + shot.y * gridSpacing;
+                // For iPhone:
+                // var centerX = 68 + shot.x * gridSpacing;
+                // var centerY = 204 + shot.y * gridSpacing;
+
+                var centerX = 120 + shot.x * gridSpacing;
+                var centerY = 130 + shot.y * gridSpacing;
                 
                 if(shot.y % 2 === 1)
                     centerX += gridSpacing / 2;
