@@ -5,12 +5,13 @@
   "private": true,
   "description": "A sample app allows you to choose which screen or window to be captured with `getUserMedia` API.",
   "dependencies": {
+    "chai": "^4.0.2",
     "tesseract.js": "^1.0.10"
   },
   "devDependencies": {},
   "scripts": {
-      "start" : "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron .",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC"
