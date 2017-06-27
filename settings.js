@@ -1,7 +1,7 @@
 module.exports = {
 
 	turnOffIsBlocker: function() {
-        return turnOff = false;
+        return turnOff = true;
     },
     turnOffCompareCluster: function() {
     	return turnOff = false;

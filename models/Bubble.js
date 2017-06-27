@@ -1,4 +1,4 @@
-// var settings = require('./settings.js');
+var settings = require('./settings.js');
 function Bubble(x, y, color, iData) {
 
     this.x = x;
