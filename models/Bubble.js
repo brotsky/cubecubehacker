@@ -322,7 +322,7 @@ function Bubble(x, y, color, iData) {
 
 
     this.blocker = function(withColor = shooterBallColor) {
-        var blockerPoints = 0;        
+        var blockerPoints = 0;
         var colors = colorArray;
         for (var i = 0; i < colors.length; i++) {
             var color = colors[i];
@@ -354,12 +354,12 @@ function Bubble(x, y, color, iData) {
     }
 
     this.sharedCluster = function(matchShot) {
-        var matchShot = matchShot; 
+        var matchShot = matchShot;
         var p1 = this.getCluster(thisBlocker.color);
         var p2 = matchShot.getCluster(matchShot.blocker().color);
 
         for (var i = 1; i < p1.size; i++) {
-            if ((p1.bubbles[1].x === p2.bubbles[i].x) && (p1.bubbles[1].y === p2.bubbles[i].y)) 
+            if ((p1.bubbles[1].x === p2.bubbles[i].x) && (p1.bubbles[1].y === p2.bubbles[i].y))
                     return true;
         }
 
@@ -382,7 +382,7 @@ function Bubble(x, y, color, iData) {
         turnOff = settings.turnOffCompareCluster();
         if (turnOff)
             return false;
-        var cluster = cluster; 
+        var cluster = cluster;
     }
 //     loadJSON('functionConfig.json',
 //          function(data) { console.log(data); },
