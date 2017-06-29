@@ -731,7 +731,7 @@ exec(command,(error, stdout, stderr) => {
       function isVee() { // function that determines if a coordinate is in the "V" (only needs one line)
         var mCurrent =  (Xjared- rotationPointX)/(Yjared- rotationPointY);
         var mRight = (rightWall - rotationPointX)/(110 - rotationPointY);
-        var mLeft = (leftWall- rotationPointX)/(110 - rotationPointY);
+        var mLeft = (leftWall- rotationPointX)/(110 - rotationPointX); // Change made from rotationPointY to X. Far right. 
 
         if (mCurrent >= mRight && mCurrent <= mLeft) return true;
         else return false;
