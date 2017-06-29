@@ -12,11 +12,11 @@
     var Tesseract = require('tesseract.js');
     var Robot = require('./models/Robot.js');
     var GameEvents = require('./models/GameEvents.js');
-    
+
     const exec = require('child_process').exec;
 
     var command = "/usr/local/bin/axi up; /usr/local/bin/axi home;";
-        
+
  //   console.log(command);
     /*
     if(!debug)
@@ -31,9 +31,9 @@
         */
 
    // exec('say -v Alex "Hello" -r 200');
-    
+
 //globals
-  
+
 var gridSpacing;
 var context;
 var showLines = false;
@@ -59,7 +59,7 @@ var heightRatio = iPhoneScreenHeightInches / iPhoneScreenHeight;
 var rightWall;
 var leftWall;
 var rotationPointX;
-var rotationPointY; 
+var rotationPointY;
 var onDeckOffset = 74;
 
 if (device === "iPad") {
@@ -67,7 +67,7 @@ if (device === "iPad") {
 gridSpacing = 51;
 
 onDeckOffset = 75;
-    
+
 iPhoneScreenWidth = 768;
 iPhoneScreenHeight = 1024;
 
@@ -78,9 +78,9 @@ rightWall = (688 / 768) * iPhoneScreenWidth;
 leftWall = (95 / 768) * iPhoneScreenWidth;
 
 rotationPointX = (385 / 768) * iPhoneScreenWidth;
-rotationPointY = (910 / 1024) * iPhoneScreenHeight; 
-    
-} else 
+rotationPointY = (910 / 1024) * iPhoneScreenHeight;
+
+} else
 
 if (device === "iPhone") {
 gridSpacing = 46.75;
@@ -98,7 +98,7 @@ rotationPointX = (208 / 416) * iPhoneScreenWidth;
 rotationPointY = (610 / 738) * iPhoneScreenHeight;
 
 }
-        
+
 
 
 var shooterBallColor, onDeckBallColor;
@@ -123,7 +123,7 @@ var readyToShoot = false;
 
 setTimeout(function(){
 command = " /usr/local/bin/axi goto " + iPhoneScreenWidthInches + " " + iPhoneScreenHeightInches + ";";
-    
+
 console.log(command);
 
 exec(command,(error, stdout, stderr) => {
@@ -194,11 +194,11 @@ exec(command,(error, stdout, stderr) => {
     border: 1px solid #e2e2e2;
     box-shadow: 0 1px 1px rgba(0,0,0,0.2);
   }
-  
+
   #output-container {
       position: relative;
   }
-  
+
   #grid, .grid-new-piece {
       position: absolute;
         top: 80px;
@@ -209,23 +209,23 @@ exec(command,(error, stdout, stderr) => {
         top: 455px;
         left: 10px;
     }
-    
+
     #grid-new-piece-2 {
         top: 455px;
         left: 110px;
     }
-    
+
     #grid-new-piece-3 {
         top: 455px;
         left: 230px;
     }
-  
+
   #grid table td {
         width: 33px;
         height: 35px;
 /*       background: rgba(255,0,0,.5); */
   }
-  
+
 /*
   #grid table td.empty {
       background: rgba(0,0,0,.5);
@@ -235,58 +235,58 @@ exec(command,(error, stdout, stderr) => {
       background: green;
   }
 
-  
-  
+
+
   .grid-new-piece table td {
         width: 18px;
         height: 19px;
       background: rgba(255,0,0,.5);
   }
-  
+
   .grid-new-piece table td.empty {
       background: rgba(0,0,0,.5);
   }
-  
+
     video, canvas {
     position: absolute;
   }
-  
+
   #timer {
       z-index: 10000;
   }
-  
+
   #output-container {
       display: none;
   }
-  
+
   #shot-ranking {
       position: fixed;
       top: 100px;
       left: 0;
   }
-  
+
   #shot-ranking ul {
       list-style: none;
   }
-  
+
 </style>
 </head>
 <body>
   <select id="picture" class="image-picker show-html">
   </select>
   <video id="iphone-screen-stream" autoplay></video>
-  
+
   <!-- Uncomment this for iPad: -->
   <canvas id="canvas" width="768" height="1024"></canvas>
-  
+
 <!-- Uncomment this for iPhone: -->
 
 <!--   <canvas id="canvas" width="416" height="738"></canvas> -->
 
   <canvas id="timer" width="50" height="50"></canvas>
-  
+
   <p><button id="enable-capture">Enable Capture</button></p>
-  
+
   <div id="shot-ranking">
       <ul>
       </ul>
@@ -296,9 +296,9 @@ exec(command,(error, stdout, stderr) => {
   <button style="position: relative; top: 540px;" id="performancePauser">Pause!</button>
   <button style="position: relative; top: 511px; left: 100px;" id="performanceResume">Resume!</button>
 
-  
+
 <button onclick="shoot()" style="width: 64px;border: solid 2px #ccc;">Capture</button>
-  
+
   <div id="output-container">
       <div id="output" style="display: inline-block; top: 4px; position: relative ;border: dotted 1px #ccc; padding: 2px;"><img src="demos/1.png"></div>
       <div id="grid"></div>
@@ -306,12 +306,12 @@ exec(command,(error, stdout, stderr) => {
       <div class="grid-new-piece" id="grid-new-piece-2"></div>
       <div class="grid-new-piece" id="grid-new-piece-3"></div>
   </div>
-  
-  
+
+
 <script src="app.js"></script>
 
   <script>
-  
+
   var paused = false;
   var t0;
   var t1;
@@ -323,53 +323,53 @@ exec(command,(error, stdout, stderr) => {
   var truePoints;
 
    document.getElementById("performancePauser").addEventListener('click',function () {
-        
+
         paused = true;
-      
+
     });
-   
+
    document.getElementById("performanceResume").addEventListener('click',function () {
-        
+
         paused = false;
-      
+
     });
 
     var grid = new Grid;
 
 
-    
+
     var w = iPhoneScreenWidth;
                     var h = iPhoneScreenHeight;
                     var videoCanvas = document.createElement('canvas');
                         videoCanvas.width  = w;
                         videoCanvas.height = h;
-          
+
           var videoContext = videoCanvas.getContext('2d');
-    
-          
+
+
     window.onload = function() {
         document.getElementById('iphone-screen-stream').setAttribute("style", "width: " + iPhoneScreenWidth + "px; height: " + iPhoneScreenHeight + "px;");
         document.getElementById('canvas').setAttribute("width", iPhoneScreenWidth);
         document.getElementById('canvas').setAttribute("height", iPhoneScreenHeight);
-        
+
       var canvas = document.getElementById('canvas');
       context = canvas.getContext('2d');
-      
+
       var timerCanvas = document.getElementById("timer");
-      
-      var video = document.getElementById('iphone-screen-stream');      
-      
+
+      var video = document.getElementById('iphone-screen-stream');
+
       context.strokeStyle = "#00901b";
       context.fillStyle = "#fff";
       context.font = '11px Helvetica';
-  
+
       var readScreen = function(delay) {
         t0 = performance.now();
         videoContext.drawImage(video, 0, 0, w, h);
 
         var timerContext = videoCanvas.getContext('2d');
             timerContext.drawImage(video,200,400,50,50);
-        
+
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         if (paused === false) {
@@ -381,66 +381,66 @@ exec(command,(error, stdout, stderr) => {
             functionPerformanceSecond.innerHTML = (1000/performanceResult).toPrecision(4);
 
         }
-                
+
         if(!isPlayingShooter(videoContext)) {
             setTimeout(readScreen,delay);
             return;
         }
 
         iData = videoContext.getImageData(rotationPointX + onDeckOffset * .2, rotationPointY, 1, 1);
-                
+
         var onDeckData = videoContext.getImageData(rotationPointX, rotationPointY + onDeckOffset, 1, 1);
-        
+
         shooterBallColor = getBubbleColor(iData);
-        
+
         if(shooterBallColor === "lightpurple")
             shooterBallColor = false;
-                    
+
         onDeckBallColor = getBubbleColor(onDeckData);
-        
+
         if(onDeckBallColor === "lightpurple")
             onDeckBallColor = false;
-        
-        
+
+
         var centerX = rotationPointX;
         var centerY = rotationPointY;
-        
+
         var radius = gridSpacing / 2;
-        
+
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
         context.lineWidth = 1;
         context.strokeStyle = '#003300';
         context.stroke();
-        
+
         displayBubbleColor = 'transparent';
-                                                
+
         if(bubbleColors.indexOf(shooterBallColor) > -1)
             displayBubbleColor = shooterBallColor;
-                                
+
         context.fillStyle = displayBubbleColor;
         if(shooterBallColor === "lightblue")
             context.fillStyle = "#34a5f2";
-        
+
         context.fill();
-        
+
         context.beginPath();
         context.arc(centerX, centerY + onDeckOffset, radius, 0, 2 * Math.PI, false);
         context.lineWidth = 1;
         context.strokeStyle = '#003300';
         context.stroke();
-                
+
         displayBubbleColor = 'transparent';
-                                                
+
         if(bubbleColors.indexOf(onDeckBallColor) > -1)
             displayBubbleColor = onDeckBallColor;
-                                
+
         context.fillStyle = displayBubbleColor;
         if(onDeckBallColor === "lightblue")
             context.fillStyle = "#34a5f2";
-        
-        context.fill();        
-            
+
+        context.fill();
+
         if(getBubbleColor(iData)) {
             grid.resetGrid();
             for(var j = 0 ; j < 15 ; j++) {
@@ -459,84 +459,84 @@ exec(command,(error, stdout, stderr) => {
                     centerY = 204 + j * gridSpacing;
 
                   }
-                    
+
                     if(j % 2 === 1)
                         centerX += gridSpacing / 2;
-                    
+
                     var radius = gridSpacing / 2;
-                    
+
                     context.beginPath();
                     context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
                     context.lineWidth = 1;
                     context.strokeStyle = '#003300';
                     context.stroke();
-                                                                
+
                         iData = videoContext.getImageData(Math.round( centerX ),  Math.round( centerY ), 1, 1);
-                        
-                        //fix bug that only happens on that single bubble                        
+
+                        //fix bug that only happens on that single bubble
                         if(j == 5 && i == 3)
                             iData = videoContext.getImageData(Math.round( centerX),  Math.round( centerY  + .3 * gridSpacing), 1, 1);
-                        
-                        
+
+
                         var bubbleColor = getBubbleColor(iData);
-                        
+
                         displayBubbleColor = 'transparent';
-                        
-                        
+
+
                         if(bubbleColors.indexOf(bubbleColor) > -1)
                             displayBubbleColor = bubbleColor;
-                                                
-                        
-                        
-                        var bubble = grid.add(i,j,displayBubbleColor,iData);    
-                        
+
+
+
+                        var bubble = grid.add(i,j,displayBubbleColor,iData);
+
                         if(bubble) {
                             context.fillStyle = displayBubbleColor;
                             if(bubbleColor === "lightblue")
                                 context.fillStyle = "#34a5f2";
-                            
+
                             context.fill();
                         } else {
                             context.fillStyle = "#333";
-                            
+
                             context.fill();
-                        }        
+                        }
                 }
-                
+
             }
-            
+
             grid.validateGrid();
 
-            
+
             //create bubbles after validation
-            
+
             var shotRanking = document.getElementById("shot-ranking");
-            
+
             shotRanking.innerHTML = "";
-                                    
+
             var shotRankingHtml = "";
-            
+
             var availableShots = grid.availableShots();
-            
+
             var intersectionCounter = 1;
             for(var i = 0 ; i < availableShots.length ; i++) {
-                                
+
                 var shot = availableShots[i];
                 thisBlocker = shot.blocker();
                 truePoints = shot.truePoints();
                 // p1 = shot.getCluster(thisBlocker.color);
-                
+
                 shotRankingHtml += "<li>"  + intersectionCounter + ": " + shot.points() + "-" + shot.isBlocker() + " pts</li>";
-                
+
                 context.beginPath();
                 context.arc(shot.getCenterX(), shot.getCenterY(), radius, 0, 2 * Math.PI, false);
                 context.fillStyle = 'rgba(0,0,0,.5)';
-                
+
                 context.fill();
                 context.lineWidth = 1;
                 context.strokeStyle = '#003300';
                 context.stroke();
-                
+
                 if(shot.isBlocker() === true){
                   context.fillStyle = "red";
                 }
@@ -544,31 +544,31 @@ exec(command,(error, stdout, stderr) => {
                   context.fillStyle = "white";
                 }
                 context.textAlign = "center";
-                context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY()); 
-            }           
-            
+                context.fillText(intersectionCounter++, shot.getCenterX(), shot.getCenterY());
+            }
+
             shotRanking.innerHTML = "<ul>" + shotRankingHtml + "</ul>";
-            
+
             var bubblesLeft = 0;
-            
+
             for(var i = 0 ; i < 5 ; i++) {
                 context.beginPath();
                 context.arc(140 + i * 39.5, 948 , 16, 0, 2 * Math.PI, false);
                 context.strokeStyle = 'rgba(170,170,170,.5)';
                 context.stroke();
-                
+
                 var upcomingBubble = videoContext.getImageData(140 + i * 39.5, 948 - 8, 1, 1);
-        
+
                 var upcomingBubbleColor = getBubbleColor(upcomingBubble);
-                                
+
                 if(upcomingBubbleColor === "silver")
                     bubblesLeft++;
             }
-                        
+
             var tempHTML = shotRanking.innerHTML;
-            
+
             tempHTML += "<div style='padding-left: 40px;'><strong>Bubbles Left:</strong> " + bubblesLeft + "</div>";
-            
+
             shotRanking.innerHTML = tempHTML;
 
             var moreTempHTML = shotRanking.innerHTML;
@@ -579,7 +579,7 @@ exec(command,(error, stdout, stderr) => {
             var moreTempHTML = shotRanking.innerHTML;
             moreTempHTML += "<div style='padding-left: 40px;'><strong>Coordinates Mouse:</strong> " + coordinates + "</div>";
             shotRanking.innerHTML = moreTempHTML;
-            
+
             document.getElementById("canvas").addEventListener("mousemove", lineToCoordinate);
             // document.getElementById("canvas").addEventListener("mouseout", lineToCoordinate);
 
@@ -589,71 +589,73 @@ exec(command,(error, stdout, stderr) => {
         //draw theoritical lines
 
         if(showLines) {
-                        
+
             context.strokeStyle = "#ff0096";
-            
+
             var lineCounter = 0;
             for(var i = 100 ; i < rotationPointY ; i+=20) {
-                
+
                 context.beginPath();
                 context.moveTo(leftWall, i);
                 context.lineTo(rotationPointX,rotationPointY);
                 context.closePath();
                 context.stroke();
                 lineCounter++;
-                
+
                 context.beginPath();
                 context.moveTo(rightWall, i);
                 context.lineTo(rotationPointX,rotationPointY);
                 context.closePath();
                 context.stroke();
-                
+
                 lineCounter++;
-            
+
             }
-            
+
             for(var i = 35 ; i <= iPhoneScreenWidth - 35 ; i+=10) {
-                
+
                 context.beginPath();
                 context.moveTo(i, 100);
                 context.lineTo(rotationPointX,rotationPointY);
                 context.closePath();
                 context.stroke();
                 lineCounter++;
-            
+
             }
-                        
+
             context.strokeStyle = "#000";
 
 
         }
 
-        if (showLineToCoordinate) {
+        // Jared started coding here
+
+        if (showLineToCoordinate) { // automatically set to true
 
           context.strokeStyle = "white";
           context.beginPath();
-          context.moveTo(Xjared,Yjared);
-          getWallCoordinates();
+          context.moveTo(Xjared,Yjared);// starts at X and Y which is where the mouse is
+          getWallCoordinates(); //changes coordArray to have LeftWall/RightWall and a newY in index 0 and 1
           context.moveTo(coordArray[0], coordArray[1]);
-          context.lineTo(rotationPointX,rotationPointY);
+          context.lineTo(rotationPointX,rotationPointY); // line to the shooter
           context.closePath();
           context.stroke();
 
-          if (Yjared > 131) {
-          secondLineCoordinates();
+         if (!isVee()) { // if the y coord is > 131
+          secondLineCoordinates(); //function that returns coordinates for secondLine
           context.beginPath();
-          context.moveTo(topWallX,topWall);
-          context.lineTo(coordArray[0],coordArray[1]);
+          context.moveTo(topWallX,topWall); // topWallX defined in secondLineCoordinates  and topWall is just 110
+          context.lineTo(coordArray[0],coordArray[1]); //
           context.closePath();
           context.stroke();
-          }
         }
-        
-        var bestShot = grid.bestShot();                    
-        
+        }
+
+        var bestShot = grid.bestShot();
+
         if(bestShot) {
             if(typeof bestShot.touchPoints != "undefined" && bestShot.touchPoints.length > 0) {
-                
+
                 context.strokeStyle = "#ff0096";
                 for(var i = 0 ; i < bestShot.touchPoints.length ; i++) {
                     context.beginPath();
@@ -662,33 +664,33 @@ exec(command,(error, stdout, stderr) => {
                     context.closePath();
                     context.stroke();
                 }
-                
-                
+
+
                 context.strokeStyle = "#000";
             }
-        
-        
+
+
             var bestTouchPoint = bestShot.bestTouchPoint();
-            
+
             if(!shooterBallColor) {
                 bestTouchPoint = false;
                 bestTouchPointTemp = bestTouchPoint;
             }
-            
-            
-            
+
+
+
             if(bestTouchPoint) {
                 if(bestTouchPointTemp == null)
                     bestTouchPointTemp = bestTouchPoint;
-                
+
                 if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
                     bestTouchPointTemp = bestTouchPoint;
-                    
+
                     bestTouchPoint.moveRobot();
                 }
 
                 if(typeof bestTouchPoint != "undefined") {
-                    
+
 
                     context.strokeStyle = "#000";
                     context.beginPath();
@@ -696,14 +698,14 @@ exec(command,(error, stdout, stderr) => {
                     context.lineTo(rotationPointX,rotationPointY);
                     context.closePath();
                     context.stroke();
-                
+
                     context.strokeStyle = "#000";
                 }
             }
-        
+
         }
-        
-        
+
+
         GameEvents.setConditions({
             "shooterBallColor" : shooterBallColor
         });
@@ -712,34 +714,55 @@ exec(command,(error, stdout, stderr) => {
 
 
       }
-      
+
       readScreen(1);
 
-      function secondLineCoordinates() {
+      // Jared's functions are below
 
-        var changingX = (Xjared - rotationPointX);
-        let m = (Yjared - rotationPointY) / changingX;
-        topWallX = ((topWall - Yjared) / -m) + Xjared;
+      function secondLineCoordinates() {
+//function that
+        var changingX = (Xjared - rotationPointX); // change in x values between rotationPointX and JaredX
+        let m = (Yjared - rotationPointY) / changingX; // slope is change in Y/ change in X
+        topWallX = ((topWall - newY) / -m) + newX; // top Wall x= (110- Yjared) / - slope added to Xjared
         return topWallX;
 
+      }
+
+      function isVee() { // function that determines if a coordinate is in the "V" (only needs one line)
+        var mCurrent =  (Xjared- rotationPointX)/(Yjared- rotationPointY);
+        var mRight = (rightWall - rotationPointX)/(110 - rotationPointY);
+        var mLeft = (leftWall- rotationPointX)/(110 - rotationPointY);
+
+        if (mCurrent >= mRight && mCurrent <= mLeft) return true;
+        else return false;
       }
 
       function getWallCoordinates() {
 
         var changingX = (Xjared - rotationPointX);
         if (changingX === 0) {
-          changingX === 0.00001;
+          changingX = 0.00001;
         }
         let m = (Yjared - rotationPointY) / changingX;
 
         if (m > 0) {
+          if (Xjared < leftWall)
+          {
+            Xjared = leftWall;
+          }
            newY = (m*(leftWall - Xjared)) + Yjared;
+           newX = leftWall;
            coordArray = [];
            coordArray.push(leftWall);
            coordArray.push(newY);
            return coordArray;
         } else {
+          if (Xjared > rightWall)
+          {
+            Xjared = rightWall;
+          }
             newY = (m*(rightWall - Xjared)) + Yjared;
+            newX = rightWall;
             coordArray = [];
             coordArray.push(rightWall);
             coordArray.push(newY);
@@ -756,40 +779,40 @@ exec(command,(error, stdout, stderr) => {
 
       function coordinatesFunction(event) {
           var canvas = document.getElementById("canvas");
-            
+
             var x = event.clientX - canvas.offsetLeft;
             var y = event.clientY - canvas.offsetTop;
-            
+
             coordinates = "(" + x + ", " + y + ")";
             // console.log(coordinates);
             return coordinates;
       }
 
 
-            
+
       function stylusPos(event) {
-            
+
             var canvas = document.getElementById("canvas");
-            
+
             var x = event.clientX - canvas.offsetLeft;
             var y = event.clientY - canvas.offsetTop;
-            
+
             console.log("canvasX: " + x +
             " - canvasY: " + y);
-            
+
             console.log(getBubbleColor(videoContext.getImageData(x,y, 1, 1)));
-            
+
             var robot_x = widthRatio * x;
             var robot_y = heightRatio * y;
-            
-            
+
+
             return;
-            
-            
+
+
          //   var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
-            
+
             var command = " /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; ";
-            
+
             console.log(command);
          //   return;
             exec(command,(error, stdout, stderr) => {
@@ -799,14 +822,14 @@ exec(command,(error, stdout, stderr) => {
                   }
                   console.log(`stdout: ${stdout}`);
                   console.log(`stderr: ${stderr}`);
-                });            
+                });
         }
-        
+
         function stylusDown(event) {
-                                
-            
+
+
             var command = "/usr/local/bin/axi down;";
-            
+
             console.log(command);
          //   return;
             exec(command,(error, stdout, stderr) => {
@@ -816,14 +839,14 @@ exec(command,(error, stdout, stderr) => {
                   }
                   console.log(`stdout: ${stdout}`);
                   console.log(`stderr: ${stderr}`);
-                });            
+                });
         }
-        
+
         function stylusUp(event) {
-                                
-            
+
+
             var command = "/usr/local/bin/axi up;";
-            
+
             console.log(command);
          //   return;
             exec(command,(error, stdout, stderr) => {
@@ -833,22 +856,22 @@ exec(command,(error, stdout, stderr) => {
                   }
                   console.log(`stdout: ${stdout}`);
                   console.log(`stderr: ${stderr}`);
-                });            
+                });
         }
 
         // document.getElementById("performancePauser").addEventListener('click',function () {
-        
+
         // console.log('hit');
         // console.log(functionPerformance.innerHTML);
-      
+
         // });
-        
+
     //   document.getElementById("canvas").addEventListener("mousemove", stylusPos);
-      
+
     //    document.getElementById("canvas").addEventListener("mousedown",stylusDown);
       //  document.getElementById("canvas").addEventListener("mouseup",stylusUp);
-      
-      
+
+
     };
   </script>
 </body>
