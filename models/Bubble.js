@@ -31,7 +31,7 @@ function Bubble(x, y, color, iData) {
         }
 
         //prioritize shots that are higher up if they have the same points
-        points += (15 - this.y) / 100;
+        points += (15 - this.y)/ 100;
 
         return points;
     }

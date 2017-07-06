@@ -43,6 +43,7 @@ var Yjared;
 var Xjared;
 var newY;
 var coordArray = [];
+
 var topWall = 110;
 var topWallX;
 var m, b, deltaX, deltaY, wall, wallX, wallY, wallB, iData;
@@ -410,7 +411,7 @@ exec(command,(error, stdout, stderr) => {
         context.beginPath();
         context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
         context.lineWidth = 1;
-        context.strokeStyle = '#003300';
+        context.strokeStyle = '#003300'; // green
         context.stroke();
 
         displayBubbleColor = 'transparent';
@@ -540,6 +541,7 @@ exec(command,(error, stdout, stderr) => {
                 if(shot.isBlocker() === true){
                   context.fillStyle = "red";
                 }
+
                 else{
                   context.fillStyle = "white";
                 }
@@ -637,19 +639,71 @@ exec(command,(error, stdout, stderr) => {
           context.moveTo(Xjared,Yjared);// starts at X and Y which is where the mouse is
           getWallCoordinates(); //changes coordArray to have LeftWall/RightWall and a newY in index 0 and 1
           context.moveTo(coordArray[0], coordArray[1]);
+          var lineOneM;
+          var lineOneB;
+            lineOneM= (coordArray[1]- rotationPointY)/(coordArray[0]- rotationPointX);
+            lineOneB = Yjared - (lineOneM*Xjared);
           context.lineTo(rotationPointX,rotationPointY); // line to the shooter
           context.closePath();
           context.stroke();
+          highlightBubblesOnPath(lineOneM, lineOneB);
 
-         if (!isVee()) { // if the y coord is > 131
+
+         if (!isVee()) {
           secondLineCoordinates(); //function that returns coordinates for secondLine
           context.beginPath();
           context.moveTo(topWallX,topWall); // topWallX defined in secondLineCoordinates  and topWall is just 110
           context.lineTo(coordArray[0],coordArray[1]); //
+          var lineTwoM;
+          var LineTwoB;
+          if (Xjared-rotationPointX > 0)
+          {
+            lineTwoM= -1/(((coordArray[0]-rotationPointX)/(coordArray[1]- rotationPointY)));
+            lineTwoB = topWall - (topWallX*lineTwoM) -1;
+            //console.log("right");
+
+          }
+          else
+          {
+            lineTwoM =-1/(((Xjared-rotationPointX)/(Yjared- rotationPointY)));
+            lineTwoB = topWall - (topWallX*lineTwoM);
+            //console.log("left");
+          }
           context.closePath();
           context.stroke();
+          highlightBubblesOnPath(lineTwoM, lineTwoB);
         }
         }
+
+        function highlightBubblesOnPath(m,b)
+        {
+          var currentBubbs = grid.allBubbleSpaces();
+          var inters;
+          var arr = [];
+
+          for (var i = 0; i < currentBubbs.length ; i++){
+            inters = findCircleLineIntersections(radius, currentBubbs[i].getCenterX(), currentBubbs[i].getCenterY(),m,b);
+            if (inters.length > 0) // if greater than 0 we know that there is an intersection
+            {
+              arr.push(currentBubbs[i]);
+              highlight(currentBubbs[i]);
+            }
+          }
+          return arr;
+        }
+
+
+
+        function highlight(bubble) // we just need access to the x and y, not the color itself
+        {
+          context.beginPath();
+          context.arc(bubble.getCenterX(),bubble.getCenterY(), radius, 0, 2 * Math.PI, false);
+          context.fillStyle = 'lightpink';
+          context.fill();
+          context.stroke();
+
+        }
+
 
         var bestShot = grid.bestShot();
 
@@ -731,7 +785,7 @@ exec(command,(error, stdout, stderr) => {
       function isVee() { // function that determines if a coordinate is in the "V" (only needs one line)
         var mCurrent =  (Xjared- rotationPointX)/(Yjared- rotationPointY);
         var mRight = (rightWall - rotationPointX)/(110 - rotationPointY);
-        var mLeft = (leftWall- rotationPointX)/(110 - rotationPointY); // Change made from rotationPointY to X. Far right. 
+        var mLeft = (leftWall- rotationPointX)/(110 - rotationPointY);
 
         if (mCurrent >= mRight && mCurrent <= mLeft) return true;
         else return false;
