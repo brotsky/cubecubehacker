@@ -9,7 +9,7 @@ var colorArrayMatches = function(c1,c2) {
 }
 
 var getBubbleColor = function(iData) {
-    
+
     var purple = [208,65,252];
     var purple2 = [197,81,247];
     var purple3 = [188,67,247];
@@ -17,6 +17,7 @@ var getBubbleColor = function(iData) {
     var purpleCrossHair2 = [132,42,160];
     var green = [66,192,1];
     var green2 = [113,197,57];
+    var green3 = [0,217,0];
     var greenCrossHair = [53,109,21];
     var orange = [247,156,0];
     var orange2 = [240,172,58];
@@ -25,15 +26,24 @@ var getBubbleColor = function(iData) {
     var lightblue = [50,162,240];
     var lightblueCrossHair = [42,94,152];
     var blue = [23,57,209];
+    var blue2 =[53,0,200];
     var red = [203,44,34];
     var red2 = [186,52,33];
+    var pink =[235,0,254];
     var lightpurple = [204,203,250];
     var darkpurple = [74,73,115];
     var silver = [170, 171, 169];
-    
-                
+    var targetGray = [176,168, 218];
+    var targetGray2 = [130,115, 165];
+    var arrowColor= [62,49,64];
+
+
     if(colorArrayMatches(iData.data,purple))
         return "purple";
+    if(colorArrayMatches(iData.data,pink))
+        return "purple";
+    if(colorArrayMatches(iData.data,arrowColor))
+        return "ARROW";
     else if(colorArrayMatches(iData.data,purple2))
         return "purple";
     else if(colorArrayMatches(iData.data,purple3))
@@ -47,6 +57,8 @@ var getBubbleColor = function(iData) {
     else if(colorArrayMatches(iData.data,green2))
         return "green";
     else if(colorArrayMatches(iData.data,greenCrossHair))
+        return "green";
+    else if(colorArrayMatches(iData.data,green3))
         return "green";
     else if(colorArrayMatches(iData.data,orange))
         return "orange";
@@ -62,6 +74,8 @@ var getBubbleColor = function(iData) {
         return "lightblue";
     else if(colorArrayMatches(iData.data,blue))
         return "blue";
+    else if(colorArrayMatches(iData.data,blue2))
+        return "blue";
     else if(colorArrayMatches(iData.data,red))
         return "red";
     else if(colorArrayMatches(iData.data,red2))
@@ -70,6 +84,12 @@ var getBubbleColor = function(iData) {
         return "lightpurple";
     else if(colorArrayMatches(iData.data,darkpurple))
         return "darkpurple";
+    // else if(colorArrayMatches(iData.data,targetGray))
+    //     return "targetGray";
+    else if(colorArrayMatches(iData.data,targetGray2))
+        return "targetGray";
+  //  else if(colorArrayMatches(iData.data,targetGray2))
+  //      return "targetGray";
     else if(colorArrayMatches(iData.data,silver))
         return "silver";
     else
@@ -78,28 +98,28 @@ var getBubbleColor = function(iData) {
 
 function isPlayingShooter(videoContext) {
     var isPlaying = true;
-    
+
     //make sure the bottom corner is light purple
     var checkIfOnGameColor = videoContext.getImageData(iPhoneScreenWidth - 10, iPhoneScreenHeight - 10, 1, 1);
     if(getBubbleColor(checkIfOnGameColor) !== "lightpurple") {
         isPlaying = false;
     }
-    
+
     //make sure the space next to on deck bubble is light purple
     var checkIfOnGameColor = videoContext.getImageData(rotationPointX + gridSpacing, rotationPointY + onDeckOffset, 1, 1);
     if(getBubbleColor(checkIfOnGameColor) !== "lightpurple") {
         isPlaying = false;
     }
-    
+
     var checkIfOnGameColor = videoContext.getImageData(rotationPointX, iPhoneScreenHeight * .59, 1, 1);
-        
+
     //if there is dark purple in the middle of screen the game is over
     if(getBubbleColor(checkIfOnGameColor) === "darkpurple") {
         isPlaying = false;
     }
-    
+
   //  console.log("isPlaying",isPlaying);
-    
+
     return isPlaying;
-        
+
 }

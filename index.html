@@ -4,7 +4,12 @@
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="node_modules/tracking/build/tracking-min.js"></script>
 <script src="node_modules/dat.gui/build/dat.gui.min.js"></script>
+<script type="text/javascript" src ="path.js"></script>
 
+
+
+
+</script>
 <script src="stats.min.js"></script>
 
 <script type="text/javascript">
@@ -43,6 +48,9 @@ var Yjared;
 var Xjared;
 var newY;
 var coordArray = [];
+var arrCo;
+var targetCoords =[]; // 0 being x , 1 being y
+
 
 var topWall = 110;
 var topWallX;
@@ -142,6 +150,7 @@ exec(command,(error, stdout, stderr) => {
 <script src="models/Bubble.js"></script>
 <script src="models/Grid.js"></script>
 <script src="models/TouchPoint.js"></script>
+<script src="models/Target.js"></script>
 
 <script src="helpers/math.js"></script>
 <script src="helpers/imageRecognition.js"></script>
@@ -296,6 +305,7 @@ exec(command,(error, stdout, stderr) => {
   <div style="position: relative; top: 540px; padding: 10px; background-color: #000; color: #FFF; width: 100%; font-size: 25pt;" id="execution-time">Execution Time: <span id="changing-time"></span> milliseconds / <span id="changing-time-second"></span> fps</div>
   <button style="position: relative; top: 540px;" id="performancePauser">Pause!</button>
   <button style="position: relative; top: 511px; left: 100px;" id="performanceResume">Resume!</button>
+  <button style="position: relative; top: 482px; left: 200px;" id="performanceTarget">Target!</button>
 
 
 <button onclick="shoot()" style="width: 64px;border: solid 2px #ccc;">Capture</button>
@@ -322,6 +332,10 @@ exec(command,(error, stdout, stderr) => {
   var thisBlocker;
   // var p1;
   var truePoints;
+  var targetButton = false;
+  var pixelArray = [];
+  var targetArray = [];
+  var pos;
 
    document.getElementById("performancePauser").addEventListener('click',function () {
 
@@ -333,6 +347,63 @@ exec(command,(error, stdout, stderr) => {
 
         paused = false;
 
+    });
+
+    document.getElementById("performanceTarget").addEventListener('click',function (){
+
+      var videoContext = videoCanvas.getContext('2d');
+      var AllPixels = new Target(videoContext);
+      var targetArr = [];
+
+      pixelArray = AllPixels.findAllPixels();
+      for (var i=0; i < pixelArray.length ; i++)
+      {
+
+        if(getBubbleColor(pixelArray[i].pixel) === "targetGray")
+          {
+              targetArr.push(pixelArray[i]);
+          }
+      }
+
+           targetArray= targetArr;
+           targetArray = scaleDownTargetArray(targetArray); // scales down initial array
+
+
+
+
+
+          pos =  findMax(targetArray); //returns index of lowest y value
+
+
+
+
+if (targetArray[pos]!= undefined){
+          targetCoords[0] = ((targetArray[pos].x));
+          targetCoords[1]= ((targetArray[pos].y) - 65);
+         }
+
+        var newPixelArray = squareAroundPos(targetArray,targetCoords);
+         var targetArr2 =[];
+
+        for (var i=0; i < newPixelArray.length ; i++)
+        {
+
+          if(getBubbleColor(newPixelArray[i].pixel) === "targetGray")
+            {
+                targetArr2.push(newPixelArray[i]);
+            }
+        }
+
+        targetArray= targetArr2;
+         pos =  findMax(targetArray); //returns index of lowest y value
+
+console.log(targetCoords);
+if (targetArray[pos]!= undefined){
+         targetCoords[0] = ((targetArray[pos].x)-1);
+         targetCoords[1]= ((targetArray[pos].y) - 67);
+        }
+
+      targetButton= true;
     });
 
     var grid = new Grid;
@@ -475,9 +546,10 @@ exec(command,(error, stdout, stderr) => {
                         iData = videoContext.getImageData(Math.round( centerX ),  Math.round( centerY ), 1, 1);
 
                         //fix bug that only happens on that single bubble
-                        if(j == 5 && i == 3)
-                            iData = videoContext.getImageData(Math.round( centerX),  Math.round( centerY  + .3 * gridSpacing), 1, 1);
-
+                        if(j == 6 && i == 2) //IPHONE FIX
+                            {
+                              iData = videoContext.getImageData(Math.round( centerX),  Math.round( centerY  + .3 * gridSpacing), 1, 1);
+                            }
 
                         var bubbleColor = getBubbleColor(iData);
 
@@ -585,33 +657,56 @@ exec(command,(error, stdout, stderr) => {
             document.getElementById("canvas").addEventListener("mousemove", lineToCoordinate);
             // document.getElementById("canvas").addEventListener("mouseout", lineToCoordinate);
 
-        }
+
+if (targetButton){
+            context.fillStyle = "#000"; //black
+            if (targetArray.length >0)
+            {
+                  for (var i =0; i< targetArray.length; i++)
+                  {
+                    if (targetArray[i] != undefined)
+                    {
+                    context.fillRect(targetArray[i].x, targetArray[i].y, 5, 5);
+                    context.fill();
+                    }
+                  }
+                  context.fillStyle = "#0000ff";
+                  context.fillRect(targetCoords[0], targetCoords[1], 10, 10);
+                  context.fill();
+
+
+            }
+
+
+
+
+            }
+         }
 
 
         //draw theoritical lines
-
         if(showLines) {
 
             context.strokeStyle = "#ff0096";
 
             var lineCounter = 0;
-            for(var i = 100 ; i < rotationPointY ; i+=20) {
+            for(var i = 0 ; i < touchPoints.length ; i+=1) {
 
                 context.beginPath();
-                context.moveTo(leftWall, i);
+                context.moveTo(leftWall, touchPoints[i].y);
                 context.lineTo(rotationPointX,rotationPointY);
                 context.closePath();
                 context.stroke();
                 lineCounter++;
 
                 context.beginPath();
-                context.moveTo(rightWall, i);
+                context.moveTo(rightWall, touchPoints[i].y);
                 context.lineTo(rotationPointX,rotationPointY);
                 context.closePath();
                 context.stroke();
 
                 lineCounter++;
-
+console.log(lineCounter);
             }
 
             for(var i = 35 ; i <= iPhoneScreenWidth - 35 ; i+=10) {
@@ -630,14 +725,17 @@ exec(command,(error, stdout, stderr) => {
 
         }
 
-        // Jared started coding here
+        //Jared started coding here
 
         if (showLineToCoordinate) { // automatically set to true
 
           context.strokeStyle = "white";
           context.beginPath();
-          context.moveTo(Xjared,Yjared);// starts at X and Y which is where the mouse is
-          getWallCoordinates(); //changes coordArray to have LeftWall/RightWall and a newY in index 0 and 1
+          if (Xjared === 385)
+          {
+            Xjared =384;
+          }
+          coordArray = getWallCoordinates(Xjared,Yjared); //changes coordArray to have LeftWall/RightWall and a newY in index 0 and 1
           context.moveTo(coordArray[0], coordArray[1]);
           var lineOneM;
           var lineOneB;
@@ -646,11 +744,14 @@ exec(command,(error, stdout, stderr) => {
           context.lineTo(rotationPointX,rotationPointY); // line to the shooter
           context.closePath();
           context.stroke();
-          highlightBubblesOnPath(lineOneM, lineOneB);
+          var arr = highlightBubblesOnPath(lineOneM, lineOneB);
+          var Elon = (arr.length +1);
+          var arrOne = numberBallsOnPath(arr, 1);
 
 
-         if (!isVee()) {
-          secondLineCoordinates(); //function that returns coordinates for secondLine
+         if (!isVee(Xjared,Yjared)) {
+
+          secondLineCoordinates(Xjared,Yjared); //function that returns coordinates for secondLine
           context.beginPath();
           context.moveTo(topWallX,topWall); // topWallX defined in secondLineCoordinates  and topWall is just 110
           context.lineTo(coordArray[0],coordArray[1]); //
@@ -660,49 +761,157 @@ exec(command,(error, stdout, stderr) => {
           {
             lineTwoM= -1/(((coordArray[0]-rotationPointX)/(coordArray[1]- rotationPointY)));
             lineTwoB = topWall - (topWallX*lineTwoM) -1;
-            //console.log("right");
 
           }
           else
           {
             lineTwoM =-1/(((Xjared-rotationPointX)/(Yjared- rotationPointY)));
             lineTwoB = topWall - (topWallX*lineTwoM);
-            //console.log("left");
           }
           context.closePath();
           context.stroke();
-          highlightBubblesOnPath(lineTwoM, lineTwoB);
-        }
-        }
+          var arr2 =(highlightBubblesOnPath(lineTwoM, lineTwoB));
+          var arrTwo = numberBallsOnSecondPath(arr2, Elon, coordArray[0], coordArray[1]);
 
-        function highlightBubblesOnPath(m,b)
-        {
-          var currentBubbs = grid.allBubbleSpaces();
-          var inters;
-          var arr = [];
-
-          for (var i = 0; i < currentBubbs.length ; i++){
-            inters = findCircleLineIntersections(radius, currentBubbs[i].getCenterX(), currentBubbs[i].getCenterY(),m,b);
-            if (inters.length > 0) // if greater than 0 we know that there is an intersection
-            {
-              arr.push(currentBubbs[i]);
-              highlight(currentBubbs[i]);
-            }
+          //this part fills in the gap where there should be highlighted balls
+          if (arrTwo.length>0 &&arrOne.length >0 && (distanceBetweenPoints(arrOne[arrOne.length-1].getCenterX(), arrOne[arrOne.length-1].getCenterY(), arrTwo[0].getCenterX(), arrTwo[0].getCenterY()) > (radius*3)))
+          {
+            var bub;
+            var allBubbs = grid.allBubbleSpaces();
+            bub = allBubbs[0];
+              for (var i= 0; i< allBubbs.length; i++)
+              {
+                let distanceA = distanceBetweenPoints(bub.getCenterX(), bub.getCenterY(), coordArray[0], coordArray[1]);
+                let distanceB = distanceBetweenPoints(allBubbs[i].getCenterX(), allBubbs[i].getCenterY(), coordArray[0], coordArray[1]);
+                if (distanceA > distanceB && (arrOne.indexOf(allBubbs[i])=== -1) &&(arrTwo.indexOf(allBubbs[i])=== -1))
+                {
+                  bub = allBubbs[i];
+                }
+              }
+              highlight(bub);
+              context.fillStyle = "black";
+              context.fillText(("Elon"), bub.getCenterX(), bub.getCenterY());
           }
-          return arr;
+          }
         }
 
 
 
-        function highlight(bubble) // we just need access to the x and y, not the color itself
-        {
-          context.beginPath();
-          context.arc(bubble.getCenterX(),bubble.getCenterY(), radius, 0, 2 * Math.PI, false);
-          context.fillStyle = 'lightpink';
-          context.fill();
-          context.stroke();
-
-        }
+//   function numberBallsOnPath(arr, numberWhereToStart)
+//         {
+//           if (arr === undefined) return arr;
+//           arrCopy = arr;
+//           var arr2 =[];
+//           var distanceA;
+//           var distanceB;
+//
+//           var closest = arrCopy[0];
+//           var lth = arr.length;
+//
+// //function that finds the closest ball
+//
+//         while (arr2.length != lth){
+//           for (var i=0; i< arrCopy.length ; i++)
+//           {
+//             distanceA = distanceBetweenPoints(closest.getCenterX(), closest.getCenterY(), rotationPointX, rotationPointY);
+//             distanceB = distanceBetweenPoints(arrCopy[i].getCenterX(), arrCopy[i].getCenterY(), rotationPointX, rotationPointY);
+//             if (distanceA > distanceB)
+//             {
+//               closest = arrCopy[i];
+//             }
+//
+//           }
+//           arr2.push(closest);
+//           var a = arrCopy.indexOf(closest);
+//           arrCopy.splice(a,1);
+//           closest = arrCopy[0];
+//         }
+//
+//           var index = 0;
+//           for (var i =0; i< arr2.length; i++)
+//           {
+//             index = i+numberWhereToStart;
+//             context.font = "14px Helvetica";
+//             context.fillStyle = "black";
+//             context.fillText(index, arr2[i].getCenterX(), arr2[i].getCenterY());
+//           }
+//           return arr2;
+//
+//         }
+//
+//         function numberBallsOnSecondPath(arr,numberWhereToStart, wallpointX, wallpointY)
+//         {
+//           if (arr === undefined) return arr;
+//           arrCopy = arr;
+//           var arr2 =[];
+//           var distanceA;
+//           var distanceB;
+//
+//           var closest = arrCopy[0];
+//           var lth = arr.length;
+//
+//         //function that finds the closest ball
+//
+//         while (arr2.length != lth)
+//             {
+//               for (var i=0; i< arrCopy.length ; i++)
+//               {
+//                 distanceA = distanceBetweenPoints(closest.getCenterX(), closest.getCenterY(), wallpointX, wallpointY);
+//                 distanceB = distanceBetweenPoints(arrCopy[i].getCenterX(), arrCopy[i].getCenterY(), wallpointX, wallpointY);
+//                 if (distanceA > distanceB)
+//                 {
+//                   closest = arrCopy[i];
+//                 }
+//
+//               }
+//                 arr2.push(closest);
+//                 var a = arrCopy.indexOf(closest);
+//                 arrCopy.splice(a,1);
+//                 closest = arrCopy[0];
+//             }
+//
+//           var index = 0;
+//           for (var i =0; i< arr2.length; i++)
+//           {
+//             index = i+numberWhereToStart;
+//             context.font = "14px Helvetica";
+//             context.fillStyle = "black";
+//             context.fillText(index, arr2[i].getCenterX(), arr2[i].getCenterY());
+//           }
+//           return arr2;
+//
+//         }
+//
+//
+//
+//         function highlightBubblesOnPath(m,b)
+//         {
+//           var currentBubbs = grid.allBubbleSpaces();
+//           var inters;
+//           var arr = [];
+//
+//           for (var i = 0; i < currentBubbs.length ; i++){
+//             inters = findCircleLineIntersections(radius, currentBubbs[i].getCenterX(), currentBubbs[i].getCenterY(),m,b);
+//             if (inters.length > 0) // if greater than 0 we know that there is an intersection
+//             {
+//               arr.push(currentBubbs[i]);
+//               highlight(currentBubbs[i]);
+//             }
+//           }
+//           return arr;
+//         }
+//
+//
+//
+//         function highlight(bubble) // we just need access to the x and y, not the color itself
+//         {
+//           context.beginPath();
+//           context.arc(bubble.getCenterX(),bubble.getCenterY(), radius, 0, 2 * Math.PI, false);
+//           context.fillStyle = 'lightpink';
+//           context.fill();
+//           context.stroke();
+//
+//         }
 
 
         var bestShot = grid.bestShot();
@@ -771,59 +980,62 @@ exec(command,(error, stdout, stderr) => {
 
       readScreen(1);
 
+
+
+
       // Jared's functions are below
 
-      function secondLineCoordinates() {
-//function that
-        var changingX = (Xjared - rotationPointX); // change in x values between rotationPointX and JaredX
-        let m = (Yjared - rotationPointY) / changingX; // slope is change in Y/ change in X
-        topWallX = ((topWall - newY) / -m) + newX; // top Wall x= (110- Yjared) / - slope added to Xjared
-        return topWallX;
-
-      }
-
-      function isVee() { // function that determines if a coordinate is in the "V" (only needs one line)
-        var mCurrent =  (Xjared- rotationPointX)/(Yjared- rotationPointY);
-        var mRight = (rightWall - rotationPointX)/(110 - rotationPointY);
-        var mLeft = (leftWall- rotationPointX)/(110 - rotationPointY);
-
-        if (mCurrent >= mRight && mCurrent <= mLeft) return true;
-        else return false;
-      }
-
-      function getWallCoordinates() {
-
-        var changingX = (Xjared - rotationPointX);
-        if (changingX === 0) {
-          changingX = 0.00001;
-        }
-        let m = (Yjared - rotationPointY) / changingX;
-
-        if (m > 0) {
-          if (Xjared < leftWall)
-          {
-            Xjared = leftWall;
-          }
-           newY = (m*(leftWall - Xjared)) + Yjared;
-           newX = leftWall;
-           coordArray = [];
-           coordArray.push(leftWall);
-           coordArray.push(newY);
-           return coordArray;
-        } else {
-          if (Xjared > rightWall)
-          {
-            Xjared = rightWall;
-          }
-            newY = (m*(rightWall - Xjared)) + Yjared;
-            newX = rightWall;
-            coordArray = [];
-            coordArray.push(rightWall);
-            coordArray.push(newY);
-            return coordArray;
-        }
-
-      }
+//       function secondLineCoordinates() {
+// //function that
+//         var changingX = (Xjared - rotationPointX); // change in x values between rotationPointX and JaredX
+//         let m = (Yjared - rotationPointY) / changingX; // slope is change in Y/ change in X
+//         topWallX = ((topWall - newY) / -m) + newX; // top Wall x= (110- Yjared) / - slope added to Xjared
+//         return topWallX;
+//
+//       }
+//
+//       function isVee() { // function that determines if a coordinate is in the "V" (only needs one line)
+//         var mCurrent =  (Xjared- rotationPointX)/(Yjared- rotationPointY);
+//         var mRight = (rightWall - rotationPointX)/(110 - rotationPointY);
+//         var mLeft = (leftWall- rotationPointX)/(110 - rotationPointY);
+//
+//         if (mCurrent >= mRight && mCurrent <= mLeft) return true;
+//         else return false;
+//       }
+//
+//       function getWallCoordinates() {
+//
+//         var changingX = (Xjared - rotationPointX);
+//         if (changingX === 0) {
+//           changingX = 0.00001;
+//         }
+//         let m = (Yjared - rotationPointY) / changingX;
+//
+//         if (m > 0) {
+//           if (Xjared < leftWall)
+//           {
+//             Xjared = leftWall;
+//           }
+//            newY = (m*(leftWall - Xjared)) + Yjared;
+//            newX = leftWall;
+//            coordArray = [];
+//            coordArray.push(leftWall);
+//            coordArray.push(newY);
+//            return coordArray;
+//         } else {
+//           if (Xjared > rightWall)
+//           {
+//             Xjared = rightWall;
+//           }
+//             newY = (m*(rightWall - Xjared)) + Yjared;
+//             newX = rightWall;
+//             coordArray = [];
+//             coordArray.push(rightWall);
+//             coordArray.push(newY);
+//             return coordArray;
+//         }
+//
+//       }
 
       function lineToCoordinate(event) {
           Xjared = event.clientX - canvas.offsetLeft;
@@ -927,6 +1139,8 @@ exec(command,(error, stdout, stderr) => {
 
 
     };
+
   </script>
+
 </body>
 </html>
