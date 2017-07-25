@@ -157,54 +157,174 @@ function Grid() {
 
     //used for validation
     this.checkAvailableShots = function(availableShots) {
-        var availableSet = new Set();
+        var array = [];
+        var passed;
 
         for(var i = 0 ; i < availableShots.length ; i++) {
 
-            var passed = true;
+            passed = true;
 
-            if(availableShots[i].countFilledNeighbors() === 6)
+            if(passed && availableShots[i].countFilledNeighbors() === 6)
                 passed = false;
 
-            if(availableShots[i].y === 0 && availableShots[i].countFilledNeighbors() === 4)
+            if(passed && availableShots[i].y === 0 && availableShots[i].countFilledNeighbors() === 4)
                 passed = false;
+
+
 
             if(passed)
-                availableSet.add(availableShots[i]);
+                array.push(availableShots[i]);
         }
-        var array = [];
 
-        availableSet.forEach(function(value) {
-        array.push(value);
-        });
+
+
         return array;
     }
 
     this.availableShots = function() {
 
-        var array = [];// array [] is created
-        for(var i = 0 ; i < 11 ; i++) {
-            for(var j = 0 ; j < 15 ; j++) {
-                if((this.grid[i][j].countFilledNeighbors() >0) && this.grid[i][j].color === 0)
-                array.push(this.grid[i][j]);
+      var array = [];
+      var mySet= new Set();
+
+        var sortedBubbles = this.bubblesSortedByDistance(); //sorted bubbles is an array that also calls a function that sorts the bubbles by distance closest to the shooter
+var found;
+var index;
+var coordArr =[];
+var arr2 =[];
+var arr3 =[];
+var targetBubble;
+var touchPointX;
+var touchPointY;
+var touchPoint;
+        var lastEmptyBubble = sortedBubbles[0]; //lastEmptyBubble var is equal to the first index of sortedBubbles
+// this is the variable we will assign in order to find the available shot
+
+
+
+        for(var i = 0 ; i < touchPoints.length ; i++) { // for loop that traverses touchPoints
+
+            touchPoint = touchPoints[i]; //
+
+            touchPointX = touchPoint.x;
+            touchPointY = touchPoint.y;
+              coordArr =[];
+              arr2 =[];
+              arr3 =[];
+var f = false;
+{
+  var changingX = (touchPointX - rotationPointX);
+  if (changingX === 0) {
+    changingX = 0.00001;
+  }
+
+  var m = (touchPointY - rotationPointY) / changingX;
+
+  if (m > 0) {
+     var newY = (m*(leftWall - touchPointX)) + touchPointY;
+     var newX = leftWall;
+     coordArr.push(leftWall);
+     coordArr.push(newY);
+
+  } else {
+    if (touchPointX > rightWall)
+    {
+      touchPointX = rightWall;
+    }
+      var newY = (m*(rightWall - touchPointX)) + touchPointY;
+      var newX = rightWall;
+      coordArr.push(rightWall);
+      coordArr.push(newY);
+  }
+}
+
+              if (!isVee(touchPointX, touchPointY))
+              {
+                // hasBounce= true;
+
+                 secondLineCoordinates2(touchPointX,touchPointY, newX, newY);
+                  var lineTwoM;
+                  var LineTwoB;
+
+                  if (touchPointX-rotationPointX > 0)
+                  {
+                    lineTwoM= -1/(((coordArr[0]-rotationPointX)/(coordArr[1]- rotationPointY)));
+                    lineTwoB = topWall - (topWallX*lineTwoM) -1;
+
+                  }
+                  else
+                  {
+                    lineTwoM =-1/(((touchPointX-rotationPointX)/(touchPointY- rotationPointY)));
+                    lineTwoB = topWall - (topWallX*lineTwoM);
+                  }
+
+                 arr2 =(getBubblesOnPath(lineTwoM, lineTwoB));
+                 arr3 = numberBallsOnSecondPath2(arr2, coordArr[0], coordArr[1]); // sorts the balls on the second path
+
+                 found = false;
+                 index = 0;
+
+                   while (!found)
+                   {
+                     for (var j=0; j< arr3.length; j++)
+                     {
+                       if (arr3[j].color !=0)// (distanceBetweenPoints(arr3[j-1].getCenterX(), arr3[j-1].getCenterY(), arr3[j].getCenterX(), arr3[j].getCenterY())<(radius*4)))
+                       {
+                         index = j;
+                         break;
+                       }
+                     }
+                     found = true;
+                   }
+                   if (index >0 &&(arr3[index-1].color === 0|| arr3[index-1].removed === true) && (arr3[index-1].countFilledNeighbors() > 0 || arr3[index-1].y === 0) )//&& distanceBetweenPoints(arr5[index].getCenterX(), arr5[index-1].getCenterY(), arr5[index].getCenterX(), arr5[index].getCenterY())<(radius*2))
+                   {
+                    targetBubble = arr3[index -1];
+                    array.push(targetBubble); // if it only occurs once in array, delete it
+                    //mySet.add(targetBubble);
+                   }
+
+              }
+
+            if (touchPointX === 385)
+            {
+              touchPointX =384;
             }
-        }//
-//         var sortedBubbles = this.bubblesSortedByDistance(); //sorted bubbles is an array that also calls a function that sorts the bubbles by distance closest to the shooter
-//
-//         var lastEmptyBubble = sortedBubbles[0]; //lastEmptyBubble var is equal to the first index of sortedBubbles
-// // this is the variable we will assign in order to find the available shot
-//         for(var i = 0 ; i < touchPoints.length ; i++) { // for loop that traverses touchPoints
-//
-//             var touchPoint = touchPoints[i]; //
-//
-//             var touchPointX = touchPoint.x;
-//             var touchPointY = touchPoint.y;
-//
-//             if (touchPointX === 385)
-//             {
-//               touchPointX =384;
-//             }
-//
+              var lineOneM= (coordArr[1]- rotationPointY)/(coordArr[0]- rotationPointX);
+
+              var lineOneB = touchPointY - (lineOneM*touchPointX);
+
+              var arr4 =(getBubblesOnPath(lineOneM, lineOneB));
+              // for ( var o =0; o< arr4.length; o++){
+              //   highlight (arr4[o]);
+              // }
+              var arr5 = numberBallsOnSecondPath2(arr4, coordArr[0], coordArr[1]);
+              found = false;
+              index = 0;
+
+              arr5.reverse();
+
+                while (!found)
+                {
+
+                  for (var j=0; j< arr5.length; j++)
+                  {
+                    if (arr5[j].color != 0)// (distanceBetweenPoints(arr3[j-1].getCenterX(), arr3[j-1].getCenterY(), arr3[j].getCenterX(), arr3[j].getCenterY())<(radius*4)))
+                    {
+                      index = j;
+                      //console.log(new_index);
+                      break;
+
+                    }
+                  }
+                  found = true;
+                }
+                if (index >0 &&(arr5[index-1].color === 0|| arr5[index-1].removed === true) && (arr5[index-1].countFilledNeighbors() > 0 || arr5[index-1].y === 0) )//&& distanceBetweenPoints(arr5[index].getCenterX(), arr5[index-1].getCenterY(), arr5[index].getCenterX(), arr5[index].getCenterY())<(radius*2))
+                {
+                 targetBubble = arr5[index-1];
+                 //console.log(targetBubble2);
+                 array.push(targetBubble);
+                 //highlight(targetBubble);// if it only occurs once in array, delete it
+                 //mySet.add(targetBubble);
+                }
 //             for(var s = 0 ; s < sortedBubbles.length ; s++ ) {
 //
 //                 var shot = sortedBubbles[s]; // starts from 0
@@ -218,7 +338,7 @@ function Grid() {
 //                 if(shot.y % 2 === 1)
 //                     centerX += gridSpacing / 2;
 //
-//                 var radius = gridSpacing / 2;
+//                 // var radius = gridSpacing / 2;
 //
 //                 deltaX = rotationPointX - touchPointX; // trying to find the slope between the ball and the shooter
 //                 deltaY = rotationPointY - touchPointY;
@@ -232,20 +352,9 @@ function Grid() {
 //
 //                 var intersections = []; // trying to find the intersections
 //
-//                 intersections = findCircleLineIntersections(radius * bubbleIntersectionRadius, centerX, centerY, m, n);
+//                 intersections = findCircleLineIntersections(radius* .3, centerX, centerY, m, n);
 // // finds circle line intersections from this line that we have
 //                 var hasBounce = false; // determines if we have a shot off the wall
-//
-// // if there are no intersections
-//                 if(intersections.length === 0 && !isVee(touchPointX,touchPointY))//(touchPointX === rightWall || touchPointX === leftWall) ) {
-//                   {
-//
-//                     m = - m;
-//                     n = touchPointY - m * touchPointX;
-//                     intersections = findCircleLineIntersections(radius * bubbleIntersectionRadius, centerX, centerY, m, n);
-//
-//                     hasBounce = true; // changed this to false, so we can see if the first part worked
-//                 }
 //
 //                 if(intersections.length !== 0) {// if there arent any intersections
 //                     if(shot.color !== 0 || shot.y === 0 || shot.removed === true) {
@@ -254,25 +363,62 @@ function Grid() {
 //                         if(shot.y === 0)
 //                             shotToRecord = shot;
 //
-//                         if((shotToRecord.color === 0 || shotToRecord.removed === true) && (shotToRecord.countFilledNeighbors() > 0 || shotToRecord.y === 0)) {
+//                          if((shotToRecord.color === 0|| shotToRecord.removed === true) && (shotToRecord.countFilledNeighbors() > 0 || shotToRecord.y === 0)) {
 //                             shotToRecord.addTouchPoint(touchPoint,hasBounce);
-//                             if(!this.alreadyInCollection(shotToRecord,array))
-//                                 array.push(shotToRecord);
+//                                 mySet.add(shotToRecord);
 //                         }
 //                         break;
 //                     } else {
 //                         lastEmptyBubble = shot;
 //                     }
 //                 }
+//
+//            }
 
-          //  }
-        //}
+
+        }
+
+
+        array = this.eliminateNonDupes(array);
+
+        for (var k =0; k< array.length; k++)
+        {
+          mySet.add(array[k]);
+        }
+        var ar =[];
 
         //validate the available shots
-        return this.checkAvailableShots(array);
+        mySet.forEach(function(value) {
+        ar.push(value);
+        });
+        return this.checkAvailableShots(ar);
 
     }
+this.eliminateNonDupes = function(array)
+{
+  var current =null;
 
+  for (var i =0; i< array.length; i++)
+    {
+      var count =0;
+      current = array[i];
+      for(var j=0; j< array.length; j++)
+      {
+        if (array[j] === current) ++count;
+        if (count>1)
+          j = array.length-1;
+      }
+
+      if (count<=2)
+      {
+        array.splice(array.indexOf(current), 1);
+        array.splice(array.indexOf(current), 1);
+
+      }
+    }
+
+    return array;
+}
     this.bestShot = function() {
 
         var withColor = shooterBallColor;

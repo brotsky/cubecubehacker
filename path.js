@@ -1,5 +1,5 @@
 
-var radius = 51/2; // if on ipad
+var radius = 51/2 - 3; // if on ipad
 function secondLineCoordinates(Xjared, Yjared) {
 //function that
   var changingX = (Xjared - rotationPointX); // change in x values between rotationPointX and JaredX
@@ -143,7 +143,7 @@ function numberBallsOnPath(arr, numberWhereToStart)
           var arr = [];
 
           for (var i = 0; i < currentBubbs.length ; i++){
-            inters = findCircleLineIntersections(radius, currentBubbs[i].getCenterX(), currentBubbs[i].getCenterY(),m,b);
+            inters = findCircleLineIntersections(radius*1.2, currentBubbs[i].getCenterX(), currentBubbs[i].getCenterY(),m,b);
             if (inters.length > 0) // if greater than 0 we know that there is an intersection
             {
               arr.push(currentBubbs[i]);

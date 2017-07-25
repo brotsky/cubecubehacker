@@ -110,6 +110,39 @@ function Bubble(x, y, color, iData) {
         return spaces;
     }
 
+    this.adjacentEmptySpaces = function() {
+        var spaces = [];
+
+        var checkLocations = [
+            [this.x - 1, this.y],
+            [this.x + 1, this.y],
+            [this.x, this.y - 1],
+            [this.x, this.y + 1]
+        ];
+
+        if (this.y % 2 === 0) {
+            checkLocations.push([this.x - 1, this.y - 1]);
+            checkLocations.push([this.x - 1, this.y + 1]);
+        } else {
+            checkLocations.push([this.x + 1, this.y - 1]);
+            checkLocations.push([this.x + 1, this.y + 1]);
+        }
+
+        for (var i = 0; i < checkLocations.length; i++) {
+            if (typeof grid.grid[checkLocations[i][0]] != "undefined" && typeof grid.grid[checkLocations[i][0]][checkLocations[i][1]] != "undefined")
+                spaces.push(grid.grid[checkLocations[i][0]][checkLocations[i][1]]);
+        }
+        var spaces2 =[];
+for (var i = 0; i<spaces.length; i++)
+{
+  if (spaces[i].color ==0)
+  {
+    spaces2.push(spaces[i]);
+  }
+}
+        return spaces2;
+    }
+
     this.adjacentMatches = function(colorToMatch) {
         var matches = [];
 
@@ -117,7 +150,6 @@ function Bubble(x, y, color, iData) {
             colorToMatch = this.color;
 
         var spaces = this.adjacentSpaces();
-
         for (var i = 0; i < spaces.length; i++) {
             if (spaces[i].color === colorToMatch)
                 matches.push(spaces[i]);
@@ -274,6 +306,8 @@ function Bubble(x, y, color, iData) {
         return bubbles;
     }
 
+
+
     this.connectedToTop = function(withOutCluster) {
 
         var withOutCluster = withOutCluster;
@@ -298,6 +332,30 @@ function Bubble(x, y, color, iData) {
 
         return false;
     }
+
+    // this.connectedToBottom = function(withOutcluster) {
+    //   var withOutCluster = withOutCluster;
+    //
+    //   if (typeof withOutCluster === "undefined")
+    //       withOutCluster = [];
+    //
+    //   var adjacent = this.adjacentEmptySpaces();
+    //
+    //   if (this.color != 0)
+    //       return false;
+    //
+    //   if (this.y >= grid.lastRow())
+    //       return true;
+    //
+    //   var cluster = this.getClusterAnyColor2([], withOutCluster);
+    //
+    //   for (var i = 0; i < cluster.length; i++) {
+    //       if (cluster[i].y === 0)
+    //           return true;
+    //   }
+    //
+    //   return false;
+    // }
 
     this.getUnattachedCluster = function(withOutCluster) {
         var array = [];
