@@ -7,7 +7,6 @@ function TouchPoint(x,y) {
         var robot_x = widthRatio * this.x;
         var robot_y = heightRatio * this.y + (105 * heightRatio);
 
-
         var command = "/usr/local/bin/axi down; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi up;";
 
         if(readyToShoot)
@@ -47,7 +46,7 @@ function TouchPoint(x,y) {
 
     this.fireShot = function() {
 
-        var command = "/usr/local/bin/axi up;";
+        var command = "/usr/local/bin/axi goto" + this.x + " " + this.y;
 
         if(!debug)
             exec(command,(error, stdout, stderr) => {

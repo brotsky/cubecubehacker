@@ -10,7 +10,6 @@
 
 
 
-</script>
 <script src="stats.min.js"></script>
 
 <script type="text/javascript">
@@ -20,11 +19,14 @@
     var GameEvents = require('./models/GameEvents.js');
 
     const exec = require('child_process').exec;
-
+/*
     var command = "/usr/local/bin/axi up; /usr/local/bin/axi home;";
 
- //   console.log(command);
-    /*
+
+
+
+    console.log(command);
+
     if(!debug)
     exec(command,(error, stdout, stderr) => {
           if (error) {
@@ -34,11 +36,11 @@
           console.log(`stdout: ${stdout}`);
           console.log(`stderr: ${stderr}`);
         });
-        */
 
    // exec('say -v Alex "Hello" -r 200');
 
 //globals
+*/
 
 var gridSpacing;
 var context;
@@ -81,8 +83,8 @@ onDeckOffset = 75;
 iPhoneScreenWidth = 768;
 iPhoneScreenHeight = 1024;
 
-iPhoneScreenWidthInches = 6.67 * 2;
-iPhoneScreenHeightInches = 9.4 * 2;
+iPhoneScreenWidthInches = 5.82 *2.1 ;
+iPhoneScreenHeightInches = 7.73*2.1;
 
 rightWall = (688 / 768) * iPhoneScreenWidth;
 leftWall = (95 / 768) * iPhoneScreenWidth;
@@ -127,25 +129,59 @@ var robotMoving = false;
 
 var readyToShoot = false;
 
+var m1, m2;
 
-
-/*
+m1 = (23850^.5) * (2048 / 1536);
+var b = m1 - (11925^.5);
+var c = -(b^2) + ((m1- 23850)^2);
+c= (((31800-23850)^2)-11925)^0.5;
+console.log(c);
+m2 = c;
+m1 = 27550;
 
 setTimeout(function(){
-command = " /usr/local/bin/axi goto " + iPhoneScreenWidthInches + " " + iPhoneScreenHeightInches + ";";
-
+command = "axibot manual xy_move " + m1 +" "+ m2 + " 2000; axibot manual xy_move " + (-m1) + " "+ (-m2) + " 2000;";//" axibot manual disable_motors;";
 console.log(command);
 
 exec(command,(error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         return;
-      }
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
-    });
-}, 2000);
-*/
+     }
+     console.log(`stdout: ${stdout}`);
+     console.log(`stderr: ${stderr}`);
+   });
+}, 1);
+
+//
+//  setTimeout(function(){
+//  command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + iPhoneScreenWidthInches + " " + iPhoneScreenHeightInches + "; /usr/local/bin/axi down;";
+//  console.log(command);
+//
+//  exec(command,(error, stdout, stderr) => {
+//        if (error) {
+//          console.error(`exec error: ${error}`);
+//          return;
+//       }
+//       console.log(`stdout: ${stdout}`);
+//       console.log(`stderr: ${stderr}`);
+//     });
+// }, 5000);
+//
+// setTimeout(function(){
+//   command = "/usr/local/bin/axi up; /usr/local/bin/axi home; /usr/local/bin/axi down;";
+//   console.log(command);
+//
+//   exec(command,(error, stdout, stderr) => {
+//         if (error) {
+//           console.error(`exec error: ${error}`);
+//           return;
+//         }
+//         console.log(`stdout: ${stdout}`);
+//         console.log(`stderr: ${stderr}`);
+//       });
+// }, 5000);
+
 </script>
 
 <script src="models/Bubble.js"></script>
@@ -944,14 +980,14 @@ console.log(lineCounter);
 
 
             if(bestTouchPoint) {
-                if(bestTouchPointTemp == null)
-                    bestTouchPointTemp = bestTouchPoint;
-
-                if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
-                    bestTouchPointTemp = bestTouchPoint;
-
-                    bestTouchPoint.moveRobot();
-                }
+                // if(bestTouchPointTemp == null)
+                //     bestTouchPointTemp = bestTouchPoint;
+                //
+                // if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
+                //     bestTouchPointTemp = bestTouchPoint;
+                //
+                //     bestTouchPoint.moveRobot();
+                // }
 
                 if(typeof bestTouchPoint != "undefined") {
 
@@ -1076,7 +1112,8 @@ console.log(lineCounter);
             return;
 
 
-         //   var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
+            //var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
+
 
             var command = " /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; ";
 

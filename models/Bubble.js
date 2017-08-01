@@ -252,6 +252,7 @@ for (var i = 0; i<spaces.length; i++)
             else
                 withoutBounce.push(this.touchPoints[i]);
         }
+         
 
         if (withoutBounce.length > 0) {
 
