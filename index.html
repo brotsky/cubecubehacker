@@ -135,24 +135,23 @@ m1 = (23850^.5) * (2048 / 1536);
 var b = m1 - (11925^.5);
 var c = -(b^2) + ((m1- 23850)^2);
 c= (((31800-23850)^2)-11925)^0.5;
-console.log(c);
-m2 = c;
-m1 = 27550;
+//console.log(c);
+// setTimeout(function(){
+// command = "axibot manual xy_move " + m1 +" "+ m2 + " 3000; axibot manual xy_move " + (-m1) + " "+ (-m2) + " 3000;";//" axibot manual disable_motors;";
+// console.log(command);
+//
+// exec(command,(error, stdout, stderr) => {
+//       if (error) {
+//         console.error(`exec error: ${error}`);
+//         return;
+//      }
+//      console.log(`stdout: ${stdout}`);
+//      console.log(`stderr: ${stderr}`);
+//    });
+// }, 1000);
 
-setTimeout(function(){
-command = "axibot manual xy_move " + m1 +" "+ m2 + " 2000; axibot manual xy_move " + (-m1) + " "+ (-m2) + " 2000;";//" axibot manual disable_motors;";
-console.log(command);
 
-exec(command,(error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-     }
-     console.log(`stdout: ${stdout}`);
-     console.log(`stderr: ${stderr}`);
-   });
-}, 1);
-
+Robot.tester();
 //
 //  setTimeout(function(){
 //  command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + iPhoneScreenWidthInches + " " + iPhoneScreenHeightInches + "; /usr/local/bin/axi down;";
@@ -316,6 +315,12 @@ exec(command,(error, stdout, stderr) => {
       list-style: none;
   }
 
+  #robot-controls {
+    position: fixed;
+    top: 100px;
+    right: 0;
+  }
+
 </style>
 </head>
 <body>
@@ -337,6 +342,11 @@ exec(command,(error, stdout, stderr) => {
   <div id="shot-ranking">
       <ul>
       </ul>
+  </div>
+  <div id="robot-controls">
+      <input id="robot-control-x" type="number" min="0" max="100">
+      <input id="robot-control-y" type="number" min="0" max="100">
+      <button id="move-robot-button">Move Robot</button>
   </div>
 
   <div style="position: relative; top: 540px; padding: 10px; background-color: #000; color: #FFF; width: 100%; font-size: 25pt;" id="execution-time">Execution Time: <span id="changing-time"></span> milliseconds / <span id="changing-time-second"></span> fps</div>
@@ -1162,6 +1172,16 @@ console.log(lineCounter);
                   console.log(`stderr: ${stderr}`);
                 });
         }
+
+        document.getElementById("move-robot-button").addEventListener("click",function(){
+          console.log("pressed");
+
+          var x = document.getElementById("robot-control-x").value;
+          var y = document.getElementById("robot-control-y").value;
+          
+          Robot.goto(x,y);
+
+        });
 
         // document.getElementById("performancePauser").addEventListener('click',function () {
 
