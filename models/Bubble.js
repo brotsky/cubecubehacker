@@ -216,18 +216,15 @@ for (var i = 0; i<spaces.length; i++)
 
     this.touchPoints = [];
 
-    this.addTouchPoint = function(touchPoint, hasBounce) {
-        this.touchPoints.push({
-            "touchPoint": touchPoint,
-            "hasBounce": hasBounce
-        });
+    this.addTouchPoint = function(touchPoint) {
+        this.touchPoints.push(touchPoint);
     }
 
     this.averageTouchPointX = function(touchPoints) {
         var sum = 0;
 
         for (var i = 0; i < touchPoints.length; i++)
-            sum += touchPoints[i].touchPoint.x;
+            sum += touchPoints[i].x;
 
         return sum / touchPoints.length;
     }
@@ -236,7 +233,7 @@ for (var i = 0; i<spaces.length; i++)
         var sum = 0;
 
         for (var i = 0; i < touchPoints.length; i++)
-            sum += touchPoints[i].touchPoint.y;
+            sum += touchPoints[i].y;
 
         return sum / touchPoints.length;
     }
@@ -245,25 +242,32 @@ for (var i = 0; i<spaces.length; i++)
 
         var withBounce = [];
         var withoutBounce = [];
+        //console.log(this.touchPoints);
 
-        for (var i = 0; i < this.touchPoints.length; i++) {
-            if (this.touchPoints[i].hasBounce)
+        for (var i = 0; i < this.touchPoints.length; i++)
+        {
+            if(!isVee(this.touchPoints[i].x, this.touchPoints[i].y)){
                 withBounce.push(this.touchPoints[i]);
-            else
-                withoutBounce.push(this.touchPoints[i]);
+              }
+             else
+                withoutBounce.push(this.touchPoints[i]);;
         }
-         
+
+        //console.log(withoutBounce);
+
 
         if (withoutBounce.length > 0) {
-
             var touchPoint = new TouchPoint(this.averageTouchPointX(withoutBounce), this.averageTouchPointY(withoutBounce));
+            //touchPoint.moveRobot();
 
             return touchPoint;
         } else if (withBounce.length > 0) {
             var touchPoint = new TouchPoint(this.averageTouchPointX(withBounce), this.averageTouchPointY(withBounce));
-
+            //touchPoint.moveRobot();
             return touchPoint;
         }
+
+
 
 
         return false;

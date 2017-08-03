@@ -150,6 +150,7 @@ if that color exists, then the shooterBallColor = true;
         if(bestShot) {
           console.log("about to fire!");
             var bestTouchPoint = bestShot.bestTouchPoint();
+            console.log(bestTouchPoint);
 
             if(bestTouchPoint) {
                 if(bestTouchPointTemp == null)
@@ -157,7 +158,7 @@ if that color exists, then the shooterBallColor = true;
 
                 if(bestTouchPointTemp.x !== bestTouchPoint.x && bestTouchPointTemp.y !== bestTouchPoint.y) {
                     bestTouchPointTemp = bestTouchPoint;
-
+                    console.log("moving right about now");
                     bestTouchPoint.moveRobot();
                 } else {
                     setTimeout(this.shotFired, 100);
@@ -180,7 +181,7 @@ if that color exists, then the shooterBallColor = true;
 
         readyToShoot = true;
 
-            var command = "/usr/local/bin/axi up;";
+            var command = "axibot manual pen_down 100;";
 
                 if(!robotMoving) {
                     robotMoving = true;

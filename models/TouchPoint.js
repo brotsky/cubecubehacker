@@ -1,39 +1,27 @@
 function TouchPoint(x,y) {
     this.x = x;
     this.y = y;
+    this.robot_y = x / 768 * 100;
+    this.robot_x = y / 1024 * 100;
 
     this.moveRobot = function() {
+        // var robot_x = widthRatio * this.x;
+        // var robot_y = heightRatio * this.y + (105 * heightRatio);
 
-        var robot_x = widthRatio * this.x;
-        var robot_y = heightRatio * this.y + (105 * heightRatio);
-
-        var command = "/usr/local/bin/axi down; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi up;";
-
-        if(readyToShoot)
-            command += " /usr/local/bin/axi up;";
-
-
+      //"/usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi up;";
+// console.log("hi");
             if(!robotMoving) {
                 robotMoving = true;
 
+                  Robot.goto(this.robot_x,this.robot_y);
+                //  console.log("should have moved already!");
 
-                return;
+                  if(readyToShoot){
+                      Robot.stylusUp();
+                    }
 
-                exec(command,(error, stdout, stderr) => {
-
-                      robotMoving = false;
-
-                      if (error) {
-                        console.error(`exec error: ${error}`);
-                        return;
-                      }
-                      console.log(`stdout: ${stdout}`);
-                      console.log(`stderr: ${stderr}`);
-
-
-
-
-                    });
+                  robotMoving = false;
+            return;
             } else {
                 setTimeout(this.moveRobot, 100);
             }
@@ -45,18 +33,21 @@ function TouchPoint(x,y) {
     }
 
     this.fireShot = function() {
+      Robot.goTo(this.robot_x,this.robot_y);
+      // Robot.stylusDown();
+      // Robot.stylusUp();
 
-        var command = "/usr/local/bin/axi goto" + this.x + " " + this.y;
-
-        if(!debug)
-            exec(command,(error, stdout, stderr) => {
-                  if (error) {
-                    console.error(`exec error: ${error}`);
-                    return;
-                  }
-                  console.log(`stdout: ${stdout}`);
-                  console.log(`stderr: ${stderr}`);
-                });
+        // var command = "/usr/local/bin/axi goto" + this.x + " " + this.y;
+        //
+        // if(!debug)
+        //     exec(command,(error, stdout, stderr) => {
+        //           if (error) {
+        //             console.error(`exec error: ${error}`);
+        //             return;
+        //           }
+        //           console.log(`stdout: ${stdout}`);
+        //           console.log(`stderr: ${stderr}`);
+        //         });
 
     }
 

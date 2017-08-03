@@ -239,7 +239,7 @@ var f = false;
 
               if (!isVee(touchPointX, touchPointY))
               {
-                // hasBounce= true;
+
 
                  secondLineCoordinates2(touchPointX,touchPointY, newX, newY);
                   var lineTwoM;
@@ -278,6 +278,7 @@ var f = false;
                    if (index >0 &&(arr3[index-1].color === 0|| arr3[index-1].removed === true) && (arr3[index-1].countFilledNeighbors() > 0 || arr3[index-1].y === 0) )//&& distanceBetweenPoints(arr5[index].getCenterX(), arr5[index-1].getCenterY(), arr5[index].getCenterX(), arr5[index].getCenterY())<(radius*2))
                    {
                     targetBubble = arr3[index -1];
+                    targetBubble.addTouchPoint(touchPoints[i]);
                     array.push(targetBubble); // if it only occurs once in array, delete it
                     //mySet.add(targetBubble);
                    }
@@ -320,6 +321,7 @@ var f = false;
                 if (index >0 &&(arr5[index-1].color === 0|| arr5[index-1].removed === true) && (arr5[index-1].countFilledNeighbors() > 0 || arr5[index-1].y === 0) )//&& distanceBetweenPoints(arr5[index].getCenterX(), arr5[index-1].getCenterY(), arr5[index].getCenterX(), arr5[index].getCenterY())<(radius*2))
                 {
                  targetBubble = arr5[index-1];
+                 targetBubble.addTouchPoint(touchPoints[i]);
                  //console.log(targetBubble2);
                  array.push(targetBubble);
                  //highlight(targetBubble);// if it only occurs once in array, delete it

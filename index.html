@@ -344,9 +344,16 @@ Robot.tester();
       </ul>
   </div>
   <div id="robot-controls">
-      <input id="robot-control-x" type="number" min="0" max="100">
-      <input id="robot-control-y" type="number" min="0" max="100">
+      <div>
+      <input id="robot-control-x" type="number" min="0" max="100" value="0">
+      <input id="robot-control-y" type="number" min="0" max="100" value="0">
       <button id="move-robot-button">Move Robot</button>
+    </div>
+    <div>
+      <button id="shoot-button">Shoot!!!!</button>
+    </div>
+
+
   </div>
 
   <div style="position: relative; top: 540px; padding: 10px; background-color: #000; color: #FFF; width: 100%; font-size: 25pt;" id="execution-time">Execution Time: <span id="changing-time"></span> milliseconds / <span id="changing-time-second"></span> fps</div>
@@ -969,7 +976,7 @@ console.log(lineCounter);
                 context.strokeStyle = "#ff0096";
                 for(var i = 0 ; i < bestShot.touchPoints.length ; i++) {
                     context.beginPath();
-                    context.moveTo(bestShot.touchPoints[i].touchPoint.x, bestShot.touchPoints[i].touchPoint.y);
+                    context.moveTo(bestShot.touchPoints[i].x, bestShot.touchPoints[i].y);
                     context.lineTo(rotationPointX,rotationPointY);
                     context.closePath();
                     context.stroke();
@@ -1102,7 +1109,7 @@ console.log(lineCounter);
       }
 
 
-
+console.log(canvas.height);
       function stylusPos(event) {
 
             var canvas = document.getElementById("canvas");
@@ -1110,76 +1117,47 @@ console.log(lineCounter);
             var x = event.clientX - canvas.offsetLeft;
             var y = event.clientY - canvas.offsetTop;
 
-            console.log("canvasX: " + x +
-            " - canvasY: " + y);
+            // console.log("canvasX: " + x +
+            // " - canvasY: " + y);
 
             console.log(getBubbleColor(videoContext.getImageData(x,y, 1, 1)));
 
-            var robot_x = widthRatio * x;
-            var robot_y = heightRatio * y;
+            var robot_x = x / canvas.width * 100;
+            var robot_y = y / canvas.height * 100;
 
+            // console.log("robot_x",robot_x);
+            // console.log("robot_y",robot_y);
 
+        //    Robot.goto(robot_x,robot_y);
             return;
 
 
-            //var command = "/usr/local/bin/axi up; /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; /usr/local/bin/axi down; /usr/local/bin/axi up;";
-
-
-            var command = " /usr/local/bin/axi goto " + robot_x + " " + robot_y + "; ";
-
-            console.log(command);
-         //   return;
-            exec(command,(error, stdout, stderr) => {
-                  if (error) {
-                    console.error(`exec error: ${error}`);
-                    return;
-                  }
-                  console.log(`stdout: ${stdout}`);
-                  console.log(`stderr: ${stderr}`);
-                });
         }
 
-        function stylusDown(event) {
-
-
-            var command = "/usr/local/bin/axi down;";
-
-            console.log(command);
-         //   return;
-            exec(command,(error, stdout, stderr) => {
-                  if (error) {
-                    console.error(`exec error: ${error}`);
-                    return;
-                  }
-                  console.log(`stdout: ${stdout}`);
-                  console.log(`stderr: ${stderr}`);
-                });
-        }
-
-        function stylusUp(event) {
-
-
-            var command = "/usr/local/bin/axi up;";
-
-            console.log(command);
-         //   return;
-            exec(command,(error, stdout, stderr) => {
-                  if (error) {
-                    console.error(`exec error: ${error}`);
-                    return;
-                  }
-                  console.log(`stdout: ${stdout}`);
-                  console.log(`stderr: ${stderr}`);
-                });
-        }
 
         document.getElementById("move-robot-button").addEventListener("click",function(){
           console.log("pressed");
 
           var x = document.getElementById("robot-control-x").value;
           var y = document.getElementById("robot-control-y").value;
-          
+
           Robot.goto(x,y);
+
+        });
+
+        document.getElementById("shoot-button").addEventListener("click",function(){
+          console.log("shoot function");
+
+          Robot.goto(50,75,function(data){
+            console.log("callback function",data);
+
+            Robot.stylusDown(function(){
+              console.log("targetCoords",targetCoords);
+            });
+
+          });
+
+      //    Robot.stylusDown();
 
         });
 
@@ -1190,7 +1168,7 @@ console.log(lineCounter);
 
         // });
 
-    //   document.getElementById("canvas").addEventListener("mousemove", stylusPos);
+       //document.getElementById("canvas").addEventListener("mousemove", stylusPos);
 
     //    document.getElementById("canvas").addEventListener("mousedown",stylusDown);
       //  document.getElementById("canvas").addEventListener("mouseup",stylusUp);

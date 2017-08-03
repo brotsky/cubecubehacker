@@ -20,7 +20,7 @@ this.tester = function(){
   var _this = this;
 
   setTimeout(function(){
-  command = "axibot manual xy_move " + _this.m1a +" "+ _this.m1b + " " +  _this.move_time + ";sleep 3; axibot manual xy_move " + (-_this.m1a) + " "+ (-_this.m1b) + " " +  _this.move_time + ";";//" axibot manual disable_motors;";
+  command = "axibot manual xy_move " + _this.m1a +" "+ _this.m1b + " " +  _this.move_time + ";sleep 2; axibot manual xy_move " + (-_this.m1a) + " "+ (-_this.m1b) + " " +  _this.move_time + ";";//" axibot manual disable_motors;";
 
 //command += "sleep 5;";
 
@@ -42,15 +42,14 @@ this.tester = function(){
  }
 
  this.getMoveTime = function(toM1, toM2) {
-   var deltaM1 = Math.abs(toM2);
-   var deltaM2 = Math.abs(toM2);
+   var deltaM1 = Math.abs(toM2) + Math.abs(toM1);
 
-   var maxM = Math.max(deltaM1,deltaM2);
+  //  var maxM = Math.max(deltaM1,deltaM2);
+  var maxDelta= 31600;
 
-   var move_time = Math.ceil(this.move_time * 4 * (maxM / (this.MAXm2)));
-
-   if(move_time < 1)
-    move_time = 1;
+   var move_time = Math.ceil((1500* deltaM1)/maxDelta);
+   if(move_time < 100)
+    move_time = 100;
 
    console.log("move_time",move_time);
 
@@ -59,7 +58,7 @@ this.tester = function(){
  }
 
 
-this.goto = function(x, y) {
+this.goto = function(x, y, callback) {
 
   if(this.isMoving) {
     console.log("ERROR", "robot is currently moving");
@@ -83,12 +82,19 @@ this.goto = function(x, y) {
 
   var moveTime = this.getMoveTime(this.m1, this.m2);
 
+  this.m1= Math.round(this.m1);
+  this.m2 = Math.round(this.m2);
+
   var _this =this;
 
 
   setTimeout(function(){
     _this.isMoving = false;
-  },moveTime);
+
+    if(typeof callback == "function")
+      callback(true);
+
+  },moveTime * 2);
 
   setTimeout(function(){
   command = "axibot manual xy_move " + _this.m1 +" "+ _this.m2 + " " +  moveTime + ";";//sleep 3; axibot manual xy_move " + (-_this.m1a) + " "+ (-_this.m1b) + " " +  _this.move_time + ";";//" axibot manual disable_motors;";
@@ -115,6 +121,50 @@ this.goto = function(x, y) {
 
 return;
 
+}
+
+this.stylusUp = function(callback){
+
+
+
+    var command = "axibot manual pen_up 100;";
+
+    console.log(command);
+ //   return;
+    exec(command,(error, stdout, stderr) => {
+          if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+          }
+          console.log(`stdout: ${stdout}`);
+          console.log(`stderr: ${stderr}`);
+        });
+
+        setTimeout(function(){
+          if(typeof callback == "function")
+            callback(true);
+        },400);
+}
+
+this.stylusDown = function(callback) {
+
+
+    var command = "axibot manual pen_down 100;";
+
+    console.log(command);
+ //   return;
+    exec(command,(error, stdout, stderr) => {
+          if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+          }
+          console.log(`stdout: ${stdout}`);
+          console.log(`stderr: ${stderr}`);
+        });
+        setTimeout(function(){
+          if(typeof callback == "function")
+            callback(true);
+        },400);
 }
 
 return;
